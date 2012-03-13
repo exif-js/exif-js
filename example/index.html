@@ -1,0 +1,44 @@
+<html>
+<head>
+<script type="text/javascript" src="../binaryajax.js"></script>
+<script type="text/javascript" src="../exif.js"></script>
+
+</head>
+<body>
+
+Click the images to read Exif data. The first image tests reading single tags, while the other two simply show all available data.
+<br/><br/>
+<img src="DSCN0614_small.jpg" id="img1" />
+<br/>
+<img src="Bush-dog.jpg" id="img2" />
+<br/>
+<img src="dsc_09827.jpg" id="img3" /><br/>
+
+
+<script>
+document.getElementById("img1").onclick = function() {
+    EXIF.getData(this, function() {
+        var make = EXIF.getTag(this, "Make"),
+            model = EXIF.getTag(this, "Model");
+        alert("I was taken by a " + make + " " + model);
+    });
+}
+
+document.getElementById("img2").onclick = function() {
+    EXIF.getData(this, function() {
+        alert(EXIF.pretty(this));
+    });
+}
+
+document.getElementById("img3").onclick = function() {
+    EXIF.getData(this, function() {
+        alert(EXIF.pretty(this));
+    });
+}
+
+</script>
+
+
+
+</body>
+</html>
