@@ -5,6 +5,10 @@
 
 </head>
 <body>
+Upload a local file to read Exif data.
+<br/>
+<input id="file-input" type="file" />
+<br/><br/>
 
 Click the images to read Exif data. The first image tests reading single tags, while the other two simply show all available data.
 <br/><br/>
@@ -36,6 +40,11 @@ document.getElementById("img3").onclick = function() {
     });
 }
 
+document.getElementById('file-input').onchange = function(e) {
+    EXIF.getData(e.target.files[0], function() {
+        alert(EXIF.pretty(this));
+    });
+}
 </script>
 
 
