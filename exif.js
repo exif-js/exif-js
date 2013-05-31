@@ -306,13 +306,27 @@ var EXIF = (function() {
     }
 
     function getImageData(img, callback) {
-        BinaryAjax(img.src, function(http) {
-            var data = findEXIFinJPEG(http.binaryResponse);
+        function handleBinaryFile(binFile) {
+            var data = findEXIFinJPEG(binFile);
             img.exifdata = data || {};
             if (callback) {
                 callback.call(img)
             }
-        });
+        }
+
+        if (img instanceof Image) {
+            BinaryAjax(img.src, function(http) {
+                handleBinaryFile(http.binaryResponse);
+            });
+        } else if (window.FileReader && img instanceof window.File) {
+            var fileReader = new FileReader();
+
+            fileReader.onload = function(e) {
+                handleBinaryFile(new BinaryFile(e.target.result));
+            };
+
+            fileReader.readAsBinaryString(img);
+        }
     }
 
     function findEXIFinJPEG(file) {
@@ -559,7 +573,7 @@ var EXIF = (function() {
 
 
     function getData(img, callback) {
-        if (!img.complete) return false;
+        if (img instanceof Image && !img.complete) return false;
         if (!imageHasData(img)) {
             getImageData(img, callback);
         } else {
