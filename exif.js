@@ -322,48 +322,48 @@ var EXIF = (function() {
             var fileReader = new FileReader();
 
             fileReader.onload = function(e) {
-                handleBinaryFile(new BinaryFile(e.target.result));
+				if (debug) console.log("Got file of length " + e.target.result.byteLength);
+                handleBinaryFile(e.target.result);
             };
 
-            fileReader.readAsBinaryString(img);
+            fileReader.readAsArrayBuffer(img);
         }
     }
 
-    function findEXIFinJPEG(file) {
-        if (file.getByteAt(0) != 0xFF || file.getByteAt(1) != 0xD8) {
+	function findEXIFinJPEG(file) {
+		var dataView = new DataView(file);
+		
+		if (debug) console.log("Got file of length " + file.byteLength);
+        if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
+            if (debug) console.log("Not a valid JPEG");
             return false; // not a valid jpeg
         }
 
         var offset = 2,
-            length = file.getLength(),
+            length = file.byteLength,
             marker;
 
         while (offset < length) {
-            if (file.getByteAt(offset) != 0xFF) {
+            if (dataView.getUint8(offset) != 0xFF) {
                 if (debug) console.log("Not a valid marker at offset " + offset + ", found: " + file.getByteAt(offset));
                 return false; // not a valid marker, something is wrong
             }
 
-            marker = file.getByteAt(offset+1);
+            marker = dataView.getUint8(offset + 1);
+			if (debug) console.log(marker);
 
             // we could implement handling for other markers here, 
             // but we're only looking for 0xFFE1 for EXIF data
 
-            if (marker == 22400) {
+            if (marker == 225) {
                 if (debug) console.log("Found 0xFFE1 marker");
                 
-                return readEXIFData(file, offset + 4, file.getShortAt(offset+2, true)-2);
+                return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2);
                 
                 // offset += 2 + file.getShortAt(offset+2, true);
 
-            } else if (marker == 225) {
-                // 0xE1 = Application-specific 1 (for EXIF)
-                if (debug) console.log("Found 0xFFE1 marker");
-                
-                return readEXIFData(file, offset + 4, file.getShortAt(offset+2, true)-2);
-
             } else {
-                offset += 2 + file.getShortAt(offset+2, true);
+                offset += 2 + dataView.getUint16(offset+2);
             }
 
         }
@@ -372,15 +372,15 @@ var EXIF = (function() {
 
 
     function readTags(file, tiffStart, dirStart, strings, bigEnd) {
-        var entries = file.getShortAt(dirStart, bigEnd),
+        var entries = file.getUint16(dirStart, !bigEnd),
             tags = {}, 
             entryOffset, tag,
             i;
             
         for (i=0;i<entries;i++) {
             entryOffset = dirStart + i*12 + 2;
-            tag = strings[file.getShortAt(entryOffset, bigEnd)];
-            if (!tag && debug) console.log("Unknown tag: " + file.getShortAt(entryOffset, bigEnd));
+            tag = strings[file.getUint16(entryOffset, !bigEnd)];
+            if (!tag && debug) console.log("Unknown tag: " + file.getUint16(entryOffset, !bigEnd));
             tags[tag] = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
         }
         return tags;
@@ -388,9 +388,9 @@ var EXIF = (function() {
 
 
     function readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd) {
-        var type = file.getShortAt(entryOffset+2, bigEnd),
-            numValues = file.getLongAt(entryOffset+4, bigEnd),
-            valueOffset = file.getLongAt(entryOffset+8, bigEnd) + tiffStart,
+        var type = file.getUint16(entryOffset+2, !bigEnd),
+            numValues = file.getUint32(entryOffset+4, !bigEnd),
+            valueOffset = file.getUint32(entryOffset+8, !bigEnd) + tiffStart,
             offset,
             vals, val, n,
             numerator, denominator;
@@ -399,47 +399,47 @@ var EXIF = (function() {
             case 1: // byte, 8-bit unsigned int
             case 7: // undefined, 8-bit byte, value depending on field
                 if (numValues == 1) {
-                    return file.getByteAt(entryOffset + 8, bigEnd);
+                    return file.getUint8(entryOffset + 8, !bigEnd);
                 } else {
                     offset = numValues > 4 ? valueOffset : (entryOffset + 8);
                     vals = [];
                     for (n=0;n<numValues;n++) {
-                        vals[n] = file.getByteAt(offset + n);
+                        vals[n] = file.getUint8(offset + n);
                     }
                     return vals;
                 }
 
             case 2: // ascii, 8-bit byte
                 offset = numValues > 4 ? valueOffset : (entryOffset + 8);
-                return file.getStringAt(offset, numValues-1);
+                return getStringFromDB(file, offset, numValues-1);
 
             case 3: // short, 16 bit int
                 if (numValues == 1) {
-                    return file.getShortAt(entryOffset + 8, bigEnd);
+                    return file.getUint16(entryOffset + 8, !bigEnd);
                 } else {
                     offset = numValues > 2 ? valueOffset : (entryOffset + 8);
                     vals = [];
                     for (n=0;n<numValues;n++) {
-                        vals[n] = file.getShortAt(offset + 2*n, bigEnd);
+                        vals[n] = file.getUint16(offset + 2*n, !bigEnd);
                     }
                     return vals;
                 }
 
             case 4: // long, 32 bit int
                 if (numValues == 1) {
-                    return file.getLongAt(entryOffset + 8, bigEnd);
+                    return file.getUint32(entryOffset + 8, !bigEnd);
                 } else {
                     vals = [];
                     for (var n=0;n<numValues;n++) {
-                        vals[n] = file.getLongAt(valueOffset + 4*n, bigEnd);
+                        vals[n] = file.getUint32(valueOffset + 4*n, !bigEnd);
                     }
                     return vals;
                 }
 
             case 5:	// rational = two long values, first is numerator, second is denominator
                 if (numValues == 1) {
-                    numerator = file.getLongAt(valueOffset, bigEnd);
-                    denominator = file.getLongAt(valueOffset+4, bigEnd);
+                    numerator = file.getUint32(valueOffset, !bigEnd);
+                    denominator = file.getUint32(valueOffset+4, !bigEnd);
                     val = new Number(numerator / denominator);
                     val.numerator = numerator;
                     val.denominator = denominator;
@@ -447,8 +447,8 @@ var EXIF = (function() {
                 } else {
                     vals = [];
                     for (n=0;n<numValues;n++) {
-                        numerator = file.getLongAt(valueOffset + 8*n, bigEnd);
-                        denominator = file.getLongAt(valueOffset+4 + 8*n, bigEnd);
+                        numerator = file.getUint32(valueOffset + 8*n, !bigEnd);
+                        denominator = file.getUint32(valueOffset+4 + 8*n, !bigEnd);
                         vals[n] = new Number(numerator / denominator);
                         vals[n].numerator = numerator;
                         vals[n].denominator = denominator;
@@ -458,32 +458,40 @@ var EXIF = (function() {
 
             case 9: // slong, 32 bit signed int
                 if (numValues == 1) {
-                    return file.getSLongAt(entryOffset + 8, bigEnd);
+                    return file.getInt32(entryOffset + 8, !bigEnd);
                 } else {
                     vals = [];
                     for (n=0;n<numValues;n++) {
-                        vals[n] = file.getSLongAt(valueOffset + 4*n, bigEnd);
+                        vals[n] = file.getInt32(valueOffset + 4*n, !bigEnd);
                     }
                     return vals;
                 }
 
             case 10: // signed rational, two slongs, first is numerator, second is denominator
                 if (numValues == 1) {
-                    return file.getSLongAt(valueOffset, bigEnd) / file.getSLongAt(valueOffset+4, bigEnd);
+                    return file.getInt32(valueOffset, !bigEnd) / file.getInt32(valueOffset+4, !bigEnd);
                 } else {
                     vals = [];
                     for (n=0;n<numValues;n++) {
-                        vals[n] = file.getSLongAt(valueOffset + 8*n, bigEnd) / file.getSLongAt(valueOffset+4 + 8*n, bigEnd);
+                        vals[n] = file.getInt32(valueOffset + 8*n, !bigEnd) / file.getInt32(valueOffset+4 + 8*n, !bigEnd);
                     }
                     return vals;
                 }
         }
     }
 
-
+	function getStringFromDB(buffer, start, length) {
+		var outstr = "";
+		for (n = start; n < start+length; n++) {
+			outstr += String.fromCharCode(buffer.getUint8(n));
+		}
+		return outstr;
+	}
+	
     function readEXIFData(file, start) {
-        if (file.getStringAt(start, 4) != "Exif") {
-            if (debug) console.log("Not valid EXIF data! " + file.getStringAt(start, 4));
+		console.log(start);
+        if (getStringFromDB(file, start, 4) != "Exif") {
+            if (debug) console.log("Not valid EXIF data! " + getStringFromDB(file, start, 4));
             return false;
         }
 
@@ -493,22 +501,22 @@ var EXIF = (function() {
             tiffOffset = start + 6;
 
         // test for TIFF validity and endianness
-        if (file.getShortAt(tiffOffset) == 0x4949) {
+        if (file.getUint16(tiffOffset) == 0x4949) {
             bigEnd = false;
-        } else if (file.getShortAt(tiffOffset) == 0x4D4D) {
+        } else if (file.getUint16(tiffOffset) == 0x4D4D) {
             bigEnd = true;
         } else {
             if (debug) console.log("Not valid TIFF data! (no 0x4949 or 0x4D4D)");
             return false;
         }
 
-        if (file.getShortAt(tiffOffset+2, bigEnd) != 0x002A) {
+		if (file.getUint16(tiffOffset+2, !bigEnd) != 0x002A) {
             if (debug) console.log("Not valid TIFF data! (no 0x002A)");
             return false;
         }
 
-        if (file.getLongAt(tiffOffset+4, bigEnd) != 0x00000008) {
-            if (debug) console.log("Not valid TIFF data! (First offset not 8)", file.getShortAt(tiffOffset+4, bigEnd));
+        if (file.getUint32(tiffOffset+4, !bigEnd) != 0x00000008) {
+            if (debug) console.log("Not valid TIFF data! (First offset not 8)", file.getUint16(tiffOffset+4, !bigEnd));
             return false;
         }
 
