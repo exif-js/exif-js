@@ -489,7 +489,6 @@ var EXIF = (function() {
 	}
 	
     function readEXIFData(file, start) {
-		console.log(start);
         if (getStringFromDB(file, start, 4) != "Exif") {
             if (debug) console.log("Not valid EXIF data! " + getStringFromDB(file, start, 4));
             return false;
