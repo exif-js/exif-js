@@ -318,7 +318,7 @@ var EXIF = (function() {
             BinaryAjax(img.src, function(http) {
                 handleBinaryFile(http.binaryResponse);
             });
-        } else if (window.FileReader && img instanceof window.File) {
+        } else if (window.FileReader && img instanceof window.Blob) {
             var fileReader = new FileReader();
 
             fileReader.onload = function(e) {
