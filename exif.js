@@ -1,9 +1,3 @@
-/*
- * Javascript EXIF Reader 0.1.6
- * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
- * Licensed under the MPL License [http://www.nihilogic.dk/licenses/mpl-license.txt]
- */
-
 
 var EXIF = (function() {
 

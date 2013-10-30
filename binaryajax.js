@@ -1,10 +1,4 @@
 
-/*
- * Binary Ajax 0.1.10
- * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
- * Licensed under the MPL License [http://www.nihilogic.dk/licenses/mpl-license.txt]
- */
-
 var BinaryFile = function(strData, iDataOffset, iDataLength) {
 	var data = strData;
 	var dataOffset = iDataOffset || 0;
