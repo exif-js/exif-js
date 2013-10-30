@@ -51,7 +51,7 @@ var EXIF = (function() {
         0x9214 : "SubjectArea",			// Location and area of main subject
         0x920A : "FocalLength",			// Focal length of the lens in mm
         0xA20B : "FlashEnergy",			// Strobe energy in BCPS
-        0xA20C : "SpatialFrequencyResponse",	// 
+        0xA20C : "SpatialFrequencyResponse",	//
         0xA20E : "FocalPlaneXResolution", 	// Number of pixels in width direction per FocalPlaneResolutionUnit
         0xA20F : "FocalPlaneYResolution", 	// Number of pixels in height direction per FocalPlaneResolutionUnit
         0xA210 : "FocalPlaneResolutionUnit", 	// Unit for measuring FocalPlaneXResolution and FocalPlaneYResolution
@@ -71,7 +71,7 @@ var EXIF = (function() {
         0xA408 : "Contrast",			// Direction of contrast processing applied by camera
         0xA409 : "Saturation", 			// Direction of saturation processing applied by camera
         0xA40A : "Sharpness",			// Direction of sharpness processing applied by camera
-        0xA40B : "DeviceSettingDescription",	// 
+        0xA40B : "DeviceSettingDescription",	//
         0xA40C : "SubjectDistanceRange",	// Distance to subject
 
         // other tags
@@ -288,15 +288,46 @@ var EXIF = (function() {
     };
 
     function addEvent(element, event, handler) {
-        if (element.addEventListener) { 
-            element.addEventListener(event, handler, false); 
-        } else if (element.attachEvent) { 
-            element.attachEvent("on" + event, handler); 
+        if (element.addEventListener) {
+            element.addEventListener(event, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent("on" + event, handler);
         }
     }
 
     function imageHasData(img) {
         return !!(img.exifdata);
+    }
+
+    function base64ToBlob(base64, contentType) {
+        contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
+        base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
+
+        var binary = atob(base64);
+        var len = binary.length;
+        var buffer = new ArrayBuffer(len);
+        var view = new Uint8Array(buffer);
+
+        for (var i = 0; i < len; i++) {
+            view[i] = binary.charCodeAt(i);
+        }
+        var blob = new Blob([view], {type: contentType});
+
+        return blob;
+    }
+
+    function objectURLToBlob (object_url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', object_url, true);
+        xhr.responseType = 'blob';
+        xhr.onload = function(e) {
+            var blob;
+            if (this.status === 200) {
+              blob = this.response;
+            }
+            callback(blob);
+        };
+        xhr.send();
     }
 
     function getImageData(img, callback) {
@@ -309,10 +340,34 @@ var EXIF = (function() {
         }
 
         if (img instanceof Image) {
-            BinaryAjax(img.src, function(http) {
-                handleBinaryFile(http.binaryResponse);
-            });
-        } else if (window.FileReader && img instanceof window.File) {
+            if (/^data\:/i.test(img.src)) { // Data URI
+                var fileReader = new FileReader();
+
+                fileReader.onload = function(e) {
+                    handleBinaryFile(new BinaryFile(e.target.result));
+                };
+
+                var blob = base64ToBlob(img.src);
+
+                fileReader.readAsBinaryString(blob);
+
+            } else if (/^blob\:/i.test(img.src)) { // Object URL
+                var fileReader = new FileReader();
+
+                fileReader.onload = function(e) {
+                    handleBinaryFile(new BinaryFile(e.target.result));
+                };
+
+                objectURLToBlob(img.src, function (blob) {
+                  fileReader.readAsBinaryString(blob);
+                });
+
+            } else { // HTTP URL
+                BinaryAjax(img.src, function(http) {
+                    handleBinaryFile(http.binaryResponse);
+                });
+            }
+        } else if (img instanceof Blob || (window.FileReader && img instanceof window.File)) {
             var fileReader = new FileReader();
 
             fileReader.onload = function(e) {
@@ -340,20 +395,20 @@ var EXIF = (function() {
 
             marker = file.getByteAt(offset+1);
 
-            // we could implement handling for other markers here, 
+            // we could implement handling for other markers here,
             // but we're only looking for 0xFFE1 for EXIF data
 
             if (marker == 22400) {
                 if (debug) console.log("Found 0xFFE1 marker");
-                
+
                 return readEXIFData(file, offset + 4, file.getShortAt(offset+2, true)-2);
-                
+
                 // offset += 2 + file.getShortAt(offset+2, true);
 
             } else if (marker == 225) {
                 // 0xE1 = Application-specific 1 (for EXIF)
                 if (debug) console.log("Found 0xFFE1 marker");
-                
+
                 return readEXIFData(file, offset + 4, file.getShortAt(offset+2, true)-2);
 
             } else {
@@ -367,10 +422,10 @@ var EXIF = (function() {
 
     function readTags(file, tiffStart, dirStart, strings, bigEnd) {
         var entries = file.getShortAt(dirStart, bigEnd),
-            tags = {}, 
+            tags = {},
             entryOffset, tag,
             i;
-            
+
         for (i=0;i<entries;i++) {
             entryOffset = dirStart + i*12 + 2;
             tag = strings[file.getShortAt(entryOffset, bigEnd)];
@@ -520,23 +575,23 @@ var EXIF = (function() {
                     case "SceneCaptureType" :
                     case "SceneType" :
                     case "CustomRendered" :
-                    case "WhiteBalance" : 
-                    case "GainControl" : 
+                    case "WhiteBalance" :
+                    case "GainControl" :
                     case "Contrast" :
                     case "Saturation" :
-                    case "Sharpness" : 
+                    case "Sharpness" :
                     case "SubjectDistanceRange" :
                     case "FileSource" :
                         exifData[tag] = StringValues[tag][exifData[tag]];
                         break;
-        
+
                     case "ExifVersion" :
                     case "FlashpixVersion" :
                         exifData[tag] = String.fromCharCode(exifData[tag][0], exifData[tag][1], exifData[tag][2], exifData[tag][3]);
                         break;
-        
-                    case "ComponentsConfiguration" : 
-                        exifData[tag] = 
+
+                    case "ComponentsConfiguration" :
+                        exifData[tag] =
                             StringValues.Components[exifData[tag][0]]
                             + StringValues.Components[exifData[tag][1]]
                             + StringValues.Components[exifData[tag][2]]
@@ -551,10 +606,10 @@ var EXIF = (function() {
             gpsData = readTags(file, tiffOffset, tiffOffset + tags.GPSInfoIFDPointer, GPSTags, bigEnd);
             for (tag in gpsData) {
                 switch (tag) {
-                    case "GPSVersionID" : 
-                        gpsData[tag] = gpsData[tag][0] 
-                            + "." + gpsData[tag][1] 
-                            + "." + gpsData[tag][2] 
+                    case "GPSVersionID" :
+                        gpsData[tag] = gpsData[tag][0]
+                            + "." + gpsData[tag][1]
+                            + "." + gpsData[tag][2]
                             + "." + gpsData[tag][3];
                         break;
                 }
@@ -585,7 +640,7 @@ var EXIF = (function() {
 
     function getAllTags(img) {
         if (!imageHasData(img)) return {};
-        var a, 
+        var a,
             data = img.exifdata,
             tags = {};
         for (a in data) {
@@ -621,14 +676,14 @@ var EXIF = (function() {
         return findEXIFinJPEG(file);
     }
 
-   
+
     return {
         readFromBinaryFile : readFromBinaryFile,
         pretty : pretty,
         getTag : getTag,
         getAllTags : getAllTags,
         getData : getData,
-        
+
         Tags : ExifTags,
         TiffTags : TiffTags,
         GPSTags : GPSTags,
