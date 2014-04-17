@@ -308,7 +308,7 @@ var EXIF = (function() {
             }
         }
 
-        if (img instanceof Image) {
+        if (img instanceof Image || img instanceof HTMLImageElement) {
             BinaryAjax(img.src, function(http) {
                 handleBinaryFile(http.binaryResponse);
             });
@@ -574,7 +574,7 @@ var EXIF = (function() {
 
 
     function getData(img, callback) {
-        if (img instanceof Image && !img.complete) return false;
+        if ((img instanceof Image || img instanceof HTMLImageElement) && !img.complete) return false;
         if (!imageHasData(img)) {
             getImageData(img, callback);
         } else {
