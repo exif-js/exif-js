@@ -13,6 +13,11 @@
     "type": "git",
     "url": "git://github.com/webthusiast/exif-js"
   },
+  "homepage": "https://github.com/webthusiast/exif-js",
+  "bugs": {
+    "url": "https://github.com/jseidelin/exif-js/issues"
+  },
+  "dependencies": [],
   "keywords": [
     "exif",
     "binaryajax",
@@ -24,6 +29,5 @@
   "maintainers": [
     "Roald de Vries <roald@webthusiast.nl> (http://webthusiast.nl/)"
   ],
-  "license": "MIT",
-  "readmeFilename": "README.md"
+  "license": "MIT"
 }
