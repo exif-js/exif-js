@@ -1,6 +1,6 @@
 {
   "name": "exif-js",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A JavaScript library for reading EXIF meta data from JPEG image files.",
   "main": "exif.js",
   "directories": {
@@ -17,7 +17,6 @@
   "bugs": {
     "url": "https://github.com/jseidelin/exif-js/issues"
   },
-  "dependencies": [],
   "keywords": [
     "exif",
     "binaryajax",
