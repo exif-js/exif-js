@@ -1,0 +1,4 @@
+.*.swp
+.DS_Store
+/exif-js-*tgz
+/npm-debug.log
