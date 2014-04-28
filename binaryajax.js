@@ -1,4 +1,3 @@
-
 var BinaryFile = function(strData, iDataOffset, iDataLength) {
 	var data = strData;
 	var dataOffset = iDataOffset || 0;
@@ -269,3 +268,5 @@ document.write(
 	+ "End Function\r\n"
 	+ "</script>\r\n"
 );
+
+module.exports = BinaryAjax;

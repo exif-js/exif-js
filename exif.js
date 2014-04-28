@@ -1,3 +1,4 @@
+BinaryAjax = require('./binaryajax');
 
 var EXIF = (function() {
 
@@ -644,3 +645,4 @@ var EXIF = (function() {
 
 })();
 
+module.exports = EXIF;

@@ -1,0 +1,29 @@
+{
+  "name": "exif-js",
+  "version": "1.0.0",
+  "description": "A JavaScript library for reading EXIF meta data from JPEG image files.",
+  "main": "exif.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/webthusiast/exif-js"
+  },
+  "keywords": [
+    "exif",
+    "binaryajax",
+    "nihilogic",
+    "browserify",
+    "commonjs"
+  ],
+  "author": "Jacob Seidelin <jseidelin@nihilogic.dk> (http://blog.nihilogic.dk/)",
+  "maintainers": [
+    "Roald de Vries <roald@webthusiast.nl> (http://webthusiast.nl/)"
+  ],
+  "license": "MIT",
+  "readmeFilename": "README.md"
+}
