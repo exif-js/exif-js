@@ -288,15 +288,31 @@ var EXIF = (function() {
     };
 
     function addEvent(element, event, handler) {
-        if (element.addEventListener) { 
-            element.addEventListener(event, handler, false); 
-        } else if (element.attachEvent) { 
-            element.attachEvent("on" + event, handler); 
+        if (element.addEventListener) {
+            element.addEventListener(event, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent("on" + event, handler);
         }
     }
 
     function imageHasData(img) {
         return !!(img.exifdata);
+    }
+    //crude test: maybe make this more authoritative?
+    function imageIsBase64Encoded(img) {
+        return !!(img.src.match("base64"));
+    }
+    //convert to ArrayBuffer so can pass to findEXIFinJPEG function
+    function convertBase64ToArrayBuffer(valueInBase64) {
+        var valueInBinary, valueInBytes, length, i, nextChar;
+        valueInBinary = atob(valueInBase64);
+        length = valueInBinary.length;
+        valueInBytes = new Uint8Array(length);
+        for (i = 0; i < length; i++)        {
+            nextChar = valueInBinary.charCodeAt(i);
+            valueInBytes[i] = nextChar;
+        }
+        return valueInBytes.buffer;
     }
 
     function getImageData(img, callback) {
@@ -309,9 +325,18 @@ var EXIF = (function() {
         }
 
         if (img instanceof Image || img instanceof HTMLImageElement) {
-            BinaryAjax(img.src, function(http) {
-                handleBinaryFile(http.binaryResponse);
-            });
+            //if it's base64 encoded then don't attempt to load using Ajax
+            if (imageIsBase64Encoded(img)) {
+                var imageArrayBuffer;
+                //get the base64 encoded part, which is after the first comma
+                imageArrayBuffer = convertBase64ToArrayBuffer(img.src.split(",")[1]);
+                //not a binary file, but it still works, so maybe we should rename the function
+                handleBinaryFile(imageArrayBuffer);
+            } else {
+                BinaryAjax(img.src, function (http) {
+                    handleBinaryFile(http.binaryResponse);
+                });
+            }
         } else if (window.FileReader && img instanceof window.File) {
             var fileReader = new FileReader();
 
@@ -326,7 +351,7 @@ var EXIF = (function() {
 
 	function findEXIFinJPEG(file) {
 		var dataView = new DataView(file);
-		
+
 		if (debug) console.log("Got file of length " + file.byteLength);
         if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
             if (debug) console.log("Not a valid JPEG");
@@ -351,9 +376,9 @@ var EXIF = (function() {
 
             if (marker == 225) {
                 if (debug) console.log("Found 0xFFE1 marker");
-                
+
                 return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2);
-                
+
                 // offset += 2 + file.getShortAt(offset+2, true);
 
             } else {
@@ -367,10 +392,10 @@ var EXIF = (function() {
 
     function readTags(file, tiffStart, dirStart, strings, bigEnd) {
         var entries = file.getUint16(dirStart, !bigEnd),
-            tags = {}, 
+            tags = {},
             entryOffset, tag,
             i;
-            
+
         for (i=0;i<entries;i++) {
             entryOffset = dirStart + i*12 + 2;
             tag = strings[file.getUint16(entryOffset, !bigEnd)];
@@ -481,7 +506,7 @@ var EXIF = (function() {
 		}
 		return outstr;
 	}
-	
+
     function readEXIFData(file, start) {
         if (getStringFromDB(file, start, 4) != "Exif") {
             if (debug) console.log("Not valid EXIF data! " + getStringFromDB(file, start, 4));
@@ -527,23 +552,23 @@ var EXIF = (function() {
                     case "SceneCaptureType" :
                     case "SceneType" :
                     case "CustomRendered" :
-                    case "WhiteBalance" : 
-                    case "GainControl" : 
+                    case "WhiteBalance" :
+                    case "GainControl" :
                     case "Contrast" :
                     case "Saturation" :
-                    case "Sharpness" : 
+                    case "Sharpness" :
                     case "SubjectDistanceRange" :
                     case "FileSource" :
                         exifData[tag] = StringValues[tag][exifData[tag]];
                         break;
-        
+
                     case "ExifVersion" :
                     case "FlashpixVersion" :
                         exifData[tag] = String.fromCharCode(exifData[tag][0], exifData[tag][1], exifData[tag][2], exifData[tag][3]);
                         break;
-        
-                    case "ComponentsConfiguration" : 
-                        exifData[tag] = 
+
+                    case "ComponentsConfiguration" :
+                        exifData[tag] =
                             StringValues.Components[exifData[tag][0]]
                             + StringValues.Components[exifData[tag][1]]
                             + StringValues.Components[exifData[tag][2]]
@@ -558,10 +583,10 @@ var EXIF = (function() {
             gpsData = readTags(file, tiffOffset, tiffOffset + tags.GPSInfoIFDPointer, GPSTags, bigEnd);
             for (tag in gpsData) {
                 switch (tag) {
-                    case "GPSVersionID" : 
-                        gpsData[tag] = gpsData[tag][0] 
-                            + "." + gpsData[tag][1] 
-                            + "." + gpsData[tag][2] 
+                    case "GPSVersionID" :
+                        gpsData[tag] = gpsData[tag][0]
+                            + "." + gpsData[tag][1]
+                            + "." + gpsData[tag][2]
                             + "." + gpsData[tag][3];
                         break;
                 }
@@ -592,7 +617,7 @@ var EXIF = (function() {
 
     function getAllTags(img) {
         if (!imageHasData(img)) return {};
-        var a, 
+        var a,
             data = img.exifdata,
             tags = {};
         for (a in data) {
@@ -628,14 +653,14 @@ var EXIF = (function() {
         return findEXIFinJPEG(file);
     }
 
-   
+
     return {
         readFromBinaryFile : readFromBinaryFile,
         pretty : pretty,
         getTag : getTag,
         getAllTags : getAllTags,
         getData : getData,
-        
+
         Tags : ExifTags,
         TiffTags : TiffTags,
         GPSTags : GPSTags,
