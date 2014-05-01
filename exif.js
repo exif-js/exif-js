@@ -315,8 +315,6 @@ var EXIF = (function() {
         return valueInBytes.buffer;
     }
 
-
-
     function getImageData(img, callback) {
         function handleBinaryFile(binFile) {
             var data = findEXIFinJPEG(binFile);
@@ -343,7 +341,7 @@ var EXIF = (function() {
             var fileReader = new FileReader();
 
             fileReader.onload = function(e) {
-                if (debug) console.log("Got file of length " + e.target.result.byteLength);
+				if (debug) console.log("Got file of length " + e.target.result.byteLength);
                 handleBinaryFile(e.target.result);
             };
 
@@ -351,10 +349,10 @@ var EXIF = (function() {
         }
     }
 
-    function findEXIFinJPEG(file) {
-        var dataView = new DataView(file);
+	function findEXIFinJPEG(file) {
+		var dataView = new DataView(file);
 
-        if (debug) console.log("Got file of length " + file.byteLength);
+		if (debug) console.log("Got file of length " + file.byteLength);
         if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
             if (debug) console.log("Not a valid JPEG");
             return false; // not a valid jpeg
@@ -371,7 +369,7 @@ var EXIF = (function() {
             }
 
             marker = dataView.getUint8(offset + 1);
-            if (debug) console.log(marker);
+			if (debug) console.log(marker);
 
             // we could implement handling for other markers here, 
             // but we're only looking for 0xFFE1 for EXIF data
@@ -501,13 +499,13 @@ var EXIF = (function() {
         }
     }
 
-    function getStringFromDB(buffer, start, length) {
-        var outstr = "";
-        for (n = start; n < start+length; n++) {
-            outstr += String.fromCharCode(buffer.getUint8(n));
-        }
-        return outstr;
-    }
+	function getStringFromDB(buffer, start, length) {
+		var outstr = "";
+		for (n = start; n < start+length; n++) {
+			outstr += String.fromCharCode(buffer.getUint8(n));
+		}
+		return outstr;
+	}
 
     function readEXIFData(file, start) {
         if (getStringFromDB(file, start, 4) != "Exif") {
@@ -530,7 +528,7 @@ var EXIF = (function() {
             return false;
         }
 
-        if (file.getUint16(tiffOffset+2, !bigEnd) != 0x002A) {
+		if (file.getUint16(tiffOffset+2, !bigEnd) != 0x002A) {
             if (debug) console.log("Not valid TIFF data! (no 0x002A)");
             return false;
         }
