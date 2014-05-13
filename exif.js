@@ -299,6 +299,32 @@ var EXIF = (function() {
         return !!(img.exifdata);
     }
 
+
+    function base64ToArrayBuffer(base64, contentType) {
+        contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
+        base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
+        var binary = atob(base64);
+        var len = binary.length;
+        var buffer = new ArrayBuffer(len);
+        var view = new Uint8Array(buffer);
+        for (var i = 0; i < len; i++) {
+            view[i] = binary.charCodeAt(i);
+        }
+        return buffer;
+    }
+
+    function objectURLToBlob(url, callback) {
+        var http = new XMLHttpRequest();
+        http.open("GET", url, true);
+        http.responseType = "blob";
+        http.onload = function(e) {
+            if (this.status == 200 || this.status === 0) {
+                callback(this.response);
+            }
+        };
+        http.send();
+    }
+
     function getImageData(img, callback) {
         function handleBinaryFile(binFile) {
             var data = findEXIFinJPEG(binFile);
@@ -309,21 +335,40 @@ var EXIF = (function() {
         }
 
         if (img instanceof Image || img instanceof HTMLImageElement) {
-            var http = new XMLHttpRequest();
-            http.onload = function() {
-                if (http.status == "200") {
-                    handleBinaryFile(http.response);
-                } else {
-                    throw "Could not load image";
-                }
-                http = null;
+            if (/^data\:/i.test(img.src)) { // Data URI
+                var arrayBuffer = base64ToArrayBuffer(img.src);
+                handleBinaryFile(arrayBuffer);
+
+            } else if (/^blob\:/i.test(img.src)) { // Object URL
+                var fileReader = new FileReader();
+                fileReader.onload = function(e) {
+                    handleBinaryFile(e.target.result);
+                };
+                objectURLToBlob(img.src, function (blob) {
+                    fileReader.readAsArrayBuffer(blob);
+                });
+            } else {
+                var http = new XMLHttpRequest();
+                http.onload = function() {
+                    if (http.status == "200") {
+                        handleBinaryFile(http.response);
+                    } else {
+                        throw "Could not load image";
+                    }
+                    http = null;
+                };
+                http.open("GET", img.src, true);
+                http.responseType = "arraybuffer";
+                http.send(null);
+            }
+        } else if (window.Blob && img instanceof window.Blob) {
+            var fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                handleBinaryFile(e.target.result);
             };
-            http.open("GET", img.src, true);
-            http.responseType = "arraybuffer";
-            http.send(null);
+            fileReader.readAsArrayBuffer(img);
         } else if (window.FileReader && img instanceof window.File) {
             var fileReader = new FileReader();
-
             fileReader.onload = function(e) {
                 if (debug) console.log("Got file of length " + e.target.result.byteLength);
                 handleBinaryFile(e.target.result);
@@ -584,6 +629,7 @@ var EXIF = (function() {
 
     function getData(img, callback) {
         if ((img instanceof Image || img instanceof HTMLImageElement) && !img.complete) return false;
+        
         if (!imageHasData(img)) {
             getImageData(img, callback);
         } else {
