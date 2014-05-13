@@ -361,13 +361,7 @@ var EXIF = (function() {
                 http.responseType = "arraybuffer";
                 http.send(null);
             }
-        } else if (window.Blob && img instanceof window.Blob) {
-            var fileReader = new FileReader();
-            fileReader.onload = function(e) {
-                handleBinaryFile(e.target.result);
-            };
-            fileReader.readAsArrayBuffer(img);
-        } else if (window.FileReader && img instanceof window.File) {
+        } else if (window.FileReader && (img instanceof window.Blob || img instanceof window.File)) {
             var fileReader = new FileReader();
             fileReader.onload = function(e) {
                 if (debug) console.log("Got file of length " + e.target.result.byteLength);
