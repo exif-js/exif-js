@@ -9,8 +9,9 @@ var EXIF = (function() {
         0x9000 : "ExifVersion",             // EXIF version
         0xA000 : "FlashpixVersion",         // Flashpix format version
 
-        // colorspace tags
+        // image data characteristics
         0xA001 : "ColorSpace",              // Color space information tag
+        0xA500 : "Gamma",                       // Gamma
 
         // image configuration
         0xA002 : "PixelXDimension",         // Valid width of meaningful image
@@ -22,7 +23,7 @@ var EXIF = (function() {
         0x927C : "MakerNote",               // Any desired information written by the manufacturer
         0x9286 : "UserComment",             // Comments by user
 
-        // related file
+        // related file information
         0xA004 : "RelatedSoundFile",        // Name of related sound file
 
         // date and time
@@ -37,8 +38,15 @@ var EXIF = (function() {
         0x829D : "FNumber",                 // F number
         0x8822 : "ExposureProgram",         // Exposure program
         0x8824 : "SpectralSensitivity",     // Spectral sensitivity
-        0x8827 : "ISOSpeedRatings",         // ISO speed rating
+        // 0x8827 : "ISOSpeedRatings",             // ISO speed rating (from older exif spec)
+        0x8827 : "PhotographicSensitivity",     //Photographic sensitivity
         0x8828 : "OECF",                    // Optoelectric conversion factor
+        0x8830 : "SensitivityType",             // Sensitivity type
+        0x8831 : "StandardOutputSensitivity",   // Standard output sensitivity
+        0x8832 : "RecommendedExposureIndex",    //Sensing method
+        0x8833 : "ISOSpeed",                    //ISO Speed
+        0x8834 : "ISOSpeedLatitudeyyy",         //ISO speed latitude YYY
+        0x8835 : "ISOSpeedLatitudezzz",         //ISO speed latitude zzz
         0x9201 : "ShutterSpeedValue",       // Shutter speed
         0x9202 : "ApertureValue",           // Lens aperture
         0x9203 : "BrightnessValue",         // Value of brightness
@@ -76,7 +84,13 @@ var EXIF = (function() {
 
         // other tags
         0xA005 : "InteroperabilityIFDPointer",
-        0xA420 : "ImageUniqueID"            // Identifier assigned uniquely to each image
+        0xA420 : "ImageUniqueID",           // Identifier assigned uniquely to each image
+        0xA430 : "CameraOwnerName",             //Owner of the camera
+        0xA431 : "BodySerialNumber",            //Body serial number
+        0xA432 : "LensSpecification",           //Lens specification
+        0xA433 : "LensMake",                    //Lens make
+        0xA434 : "LensModel",                   //Lens model
+        0xA435 : "LensSerialNumber"            //Lens serial number
     };
 
     var TiffTags = {
@@ -146,7 +160,8 @@ var EXIF = (function() {
         0x001B : "GPSProcessingMethod",
         0x001C : "GPSAreaInformation",
         0x001D : "GPSDateStamp",
-        0x001E : "GPSDifferential"
+        0x001E : "GPSDifferential",
+        0x001F : "GPSHPositioningError" //Horizontal positioning error
     };
 
     var StringValues = {
