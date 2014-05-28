@@ -556,12 +556,14 @@ var EXIF = (function() {
             return false;
         }
 
-        if (file.getUint32(tiffOffset+4, !bigEnd) != 0x00000008) {
-            if (debug) console.log("Not valid TIFF data! (First offset not 8)", file.getUint16(tiffOffset+4, !bigEnd));
+        var firstIFDOffset = file.getUint32(tiffOffset+4, !bigEnd);
+
+        if (firstIFDOffset < 0x00000008) {
+            if (debug) console.log("Not valid TIFF data! (First offset less than 8)", file.getUint32(tiffOffset+4, !bigEnd));
             return false;
         }
 
-        tags = readTags(file, tiffOffset, tiffOffset+8, TiffTags, bigEnd);
+        tags = readTags(file, tiffOffset, tiffOffset + firstIFDOffset, TiffTags, bigEnd);
 
         if (tags.ExifIFDPointer) {
             exifData = readTags(file, tiffOffset, tiffOffset + tags.ExifIFDPointer, ExifTags, bigEnd);
