@@ -387,7 +387,7 @@ var EXIF = (function() {
 
         while (offset < length) {
             if (dataView.getUint8(offset) != 0xFF) {
-                if (debug) console.log("Not a valid marker at offset " + offset + ", found: " + file.getByteAt(offset));
+                if (debug) console.log("Not a valid marker at offset " + offset + ", found: " + dataView.getUint8(offset));
                 return false; // not a valid marker, something is wrong
             }
 
