@@ -477,7 +477,20 @@ var EXIF = (function() {
         0x7A : 'captionWriter',
         0x69 : 'headline',
         0x74 : 'copyright',
-        0x0F : 'category'
+        0x0F : 'category',        
+        0x10 : 'imageRank',
+        0x65 : 'country',
+        0x73 : 'source',
+        0x5C : 'venue',
+        0x5a : 'city',
+        0x05 : 'objectName',
+        0x07 : 'editStatus',
+        0x14 : 'supplementalCategories',
+        0x64 : 'countryCode',
+        0x5f : 'state',
+        0x28 : 'specialInstructions',
+        0x65 : 'composition',
+        0x4b : 'objectCycle'
     };
     function readIPTCData(file, startOffset, sectionLength){
         var dataView = new DataView(file);
