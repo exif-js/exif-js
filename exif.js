@@ -1,9 +1,25 @@
-
-var EXIF = (function() {
+(function() {
 
     var debug = false;
 
-    var ExifTags = {
+    var root = this;
+
+    var EXIF = function(obj) {
+        if (obj instanceof EXIF) return obj;
+        if (!(this instanceof EXIF)) return new EXIF(obj);
+        this.EXIFwrapped = obj;
+    };
+
+    if (typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = EXIF;
+        }
+        exports.EXIF = EXIF;
+    } else {
+        root.EXIF = EXIF;
+    }
+
+    var ExifTags = EXIF.Tags = {
 
         // version tags
         0x9000 : "ExifVersion",             // EXIF version
@@ -51,7 +67,7 @@ var EXIF = (function() {
         0x9214 : "SubjectArea",             // Location and area of main subject
         0x920A : "FocalLength",             // Focal length of the lens in mm
         0xA20B : "FlashEnergy",             // Strobe energy in BCPS
-        0xA20C : "SpatialFrequencyResponse",    // 
+        0xA20C : "SpatialFrequencyResponse",    //
         0xA20E : "FocalPlaneXResolution",   // Number of pixels in width direction per FocalPlaneResolutionUnit
         0xA20F : "FocalPlaneYResolution",   // Number of pixels in height direction per FocalPlaneResolutionUnit
         0xA210 : "FocalPlaneResolutionUnit",    // Unit for measuring FocalPlaneXResolution and FocalPlaneYResolution
@@ -71,7 +87,7 @@ var EXIF = (function() {
         0xA408 : "Contrast",                // Direction of contrast processing applied by camera
         0xA409 : "Saturation",              // Direction of saturation processing applied by camera
         0xA40A : "Sharpness",               // Direction of sharpness processing applied by camera
-        0xA40B : "DeviceSettingDescription",    // 
+        0xA40B : "DeviceSettingDescription",    //
         0xA40C : "SubjectDistanceRange",    // Distance to subject
 
         // other tags
@@ -79,7 +95,7 @@ var EXIF = (function() {
         0xA420 : "ImageUniqueID"            // Identifier assigned uniquely to each image
     };
 
-    var TiffTags = {
+    var TiffTags = EXIF.TiffTags = {
         0x0100 : "ImageWidth",
         0x0101 : "ImageHeight",
         0x8769 : "ExifIFDPointer",
@@ -115,7 +131,7 @@ var EXIF = (function() {
         0x8298 : "Copyright"
     };
 
-    var GPSTags = {
+    var GPSTags = EXIF.GPSTags = {
         0x0000 : "GPSVersionID",
         0x0001 : "GPSLatitudeRef",
         0x0002 : "GPSLatitude",
@@ -149,7 +165,7 @@ var EXIF = (function() {
         0x001E : "GPSDifferential"
     };
 
-    var StringValues = {
+    var StringValues = EXIF.StringValues = {
         ExposureProgram : {
             0 : "Not defined",
             1 : "Manual",
@@ -288,10 +304,10 @@ var EXIF = (function() {
     };
 
     function addEvent(element, event, handler) {
-        if (element.addEventListener) { 
-            element.addEventListener(event, handler, false); 
-        } else if (element.attachEvent) { 
-            element.attachEvent("on" + event, handler); 
+        if (element.addEventListener) {
+            element.addEventListener(event, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent("on" + event, handler);
         }
     }
 
@@ -376,7 +392,7 @@ var EXIF = (function() {
 
     function findEXIFinJPEG(file) {
         var dataView = new DataView(file);
-        
+
         if (debug) console.log("Got file of length " + file.byteLength);
         if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
             if (debug) console.log("Not a valid JPEG");
@@ -396,14 +412,14 @@ var EXIF = (function() {
             marker = dataView.getUint8(offset + 1);
             if (debug) console.log(marker);
 
-            // we could implement handling for other markers here, 
+            // we could implement handling for other markers here,
             // but we're only looking for 0xFFE1 for EXIF data
 
             if (marker == 225) {
                 if (debug) console.log("Found 0xFFE1 marker");
-                
+
                 return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2);
-                
+
                 // offset += 2 + file.getShortAt(offset+2, true);
 
             } else {
@@ -413,20 +429,20 @@ var EXIF = (function() {
         }
 
     }
-    
+
     function findIPTCinJPEG(file) {
         var dataView = new DataView(file);
-        
+
         if (debug) console.log("Got file of length " + file.byteLength);
         if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
             if (debug) console.log("Not a valid JPEG");
             return false; // not a valid jpeg
         }
-        
+
         var offset = 2,
             length = file.byteLength;
-        
-        
+
+
         var isFieldSegmentStart = function(dataView, offset){
             return (
                 dataView.getUint8(offset) === 0x38 &&
@@ -437,30 +453,30 @@ var EXIF = (function() {
                 dataView.getUint8(offset+5) === 0x04
             );
         };
-        
+
         while (offset < length) {
-        
+
             if ( isFieldSegmentStart(dataView, offset )){
-            
+
                 // Get the length of the name header (which is padded to an even number of bytes)
                 var nameHeaderLength = dataView.getUint8(offset+7);
                 if(nameHeaderLength % 2 !== 0) nameHeaderLength += 1;
                 // Check for pre photoshop 6 format
                 if(nameHeaderLength === 0) {
-                    // Always 4 
+                    // Always 4
                     nameHeaderLength = 4;
                 }
-            
+
                 var startOffset = offset + 8 + nameHeaderLength;
                 var sectionLength = dataView.getUint16(offset + 6 + nameHeaderLength);
-            
+
                 return readIPTCData(file, startOffset, sectionLength);
-            
+
                 break;
-        
+
             }
-        
-        
+
+
             // Not the marker, continue searching
             offset++;
 
@@ -506,21 +522,21 @@ var EXIF = (function() {
                         data[fieldName] = fieldValue;
                     }
                 }
-            
+
             }
             segmentStartPos++;
         }
         return data;
     }
-    
-    
+
+
 
     function readTags(file, tiffStart, dirStart, strings, bigEnd) {
         var entries = file.getUint16(dirStart, !bigEnd),
-            tags = {}, 
+            tags = {},
             entryOffset, tag,
             i;
-            
+
         for (i=0;i<entries;i++) {
             entryOffset = dirStart + i*12 + 2;
             tag = strings[file.getUint16(entryOffset, !bigEnd)];
@@ -631,7 +647,7 @@ var EXIF = (function() {
         }
         return outstr;
     }
-    
+
     function readEXIFData(file, start) {
         if (getStringFromDB(file, start, 4) != "Exif") {
             if (debug) console.log("Not valid EXIF data! " + getStringFromDB(file, start, 4));
@@ -679,23 +695,23 @@ var EXIF = (function() {
                     case "SceneCaptureType" :
                     case "SceneType" :
                     case "CustomRendered" :
-                    case "WhiteBalance" : 
-                    case "GainControl" : 
+                    case "WhiteBalance" :
+                    case "GainControl" :
                     case "Contrast" :
                     case "Saturation" :
-                    case "Sharpness" : 
+                    case "Sharpness" :
                     case "SubjectDistanceRange" :
                     case "FileSource" :
                         exifData[tag] = StringValues[tag][exifData[tag]];
                         break;
-        
+
                     case "ExifVersion" :
                     case "FlashpixVersion" :
                         exifData[tag] = String.fromCharCode(exifData[tag][0], exifData[tag][1], exifData[tag][2], exifData[tag][3]);
                         break;
-        
-                    case "ComponentsConfiguration" : 
-                        exifData[tag] = 
+
+                    case "ComponentsConfiguration" :
+                        exifData[tag] =
                             StringValues.Components[exifData[tag][0]] +
                             StringValues.Components[exifData[tag][1]] +
                             StringValues.Components[exifData[tag][2]] +
@@ -710,7 +726,7 @@ var EXIF = (function() {
             gpsData = readTags(file, tiffOffset, tiffOffset + tags.GPSInfoIFDPointer, GPSTags, bigEnd);
             for (tag in gpsData) {
                 switch (tag) {
-                    case "GPSVersionID" : 
+                    case "GPSVersionID" :
                         gpsData[tag] = gpsData[tag][0] +
                             "." + gpsData[tag][1] +
                             "." + gpsData[tag][2] +
@@ -724,10 +740,9 @@ var EXIF = (function() {
         return tags;
     }
 
-
-    function getData(img, callback) {
+    EXIF.getData = function(img, callback) {
         if ((img instanceof Image || img instanceof HTMLImageElement) && !img.complete) return false;
-        
+
         if (!imageHasData(img)) {
             getImageData(img, callback);
         } else {
@@ -738,14 +753,14 @@ var EXIF = (function() {
         return true;
     }
 
-    function getTag(img, tag) {
+    EXIF.getTag = function(img, tag) {
         if (!imageHasData(img)) return;
         return img.exifdata[tag];
     }
 
-    function getAllTags(img) {
+    EXIF.getAllTags = function(img) {
         if (!imageHasData(img)) return {};
-        var a, 
+        var a,
             data = img.exifdata,
             tags = {};
         for (a in data) {
@@ -756,7 +771,7 @@ var EXIF = (function() {
         return tags;
     }
 
-    function pretty(img) {
+    EXIF.pretty = function(img) {
         if (!imageHasData(img)) return "";
         var a,
             data = img.exifdata,
@@ -777,23 +792,14 @@ var EXIF = (function() {
         return strPretty;
     }
 
-    function readFromBinaryFile(file) {
+    EXIF.readFromBinaryFile = function(file) {
         return findEXIFinJPEG(file);
     }
 
-   
-    return {
-        readFromBinaryFile : readFromBinaryFile,
-        pretty : pretty,
-        getTag : getTag,
-        getAllTags : getAllTags,
-        getData : getData,
-        
-        Tags : ExifTags,
-        TiffTags : TiffTags,
-        GPSTags : GPSTags,
-        StringValues : StringValues
-    };
-
-})();
+    if (typeof define === 'function' && define.amd) {
+        define('exif-js', [], function() {
+            return EXIF;
+        });
+    }
+}.call(this));
 
