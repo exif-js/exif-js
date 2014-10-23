@@ -352,7 +352,7 @@
             }
         }
 
-        if (img instanceof Image || img instanceof HTMLImageElement) {
+        if (img.src) {
             if (/^data\:/i.test(img.src)) { // Data URI
                 var arrayBuffer = base64ToArrayBuffer(img.src);
                 handleBinaryFile(arrayBuffer);
