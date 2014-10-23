@@ -368,7 +368,7 @@
             } else {
                 var http = new XMLHttpRequest();
                 http.onload = function() {
-                    if (http.status == "200") {
+                    if (this.status == 200 || this.status === 0) {
                         handleBinaryFile(http.response);
                     } else {
                         throw "Could not load image";
