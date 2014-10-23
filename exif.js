@@ -352,7 +352,7 @@
             }
         }
 
-        if (img instanceof Image || img instanceof HTMLImageElement) {
+        if (img.src) {
             if (/^data\:/i.test(img.src)) { // Data URI
                 var arrayBuffer = base64ToArrayBuffer(img.src);
                 handleBinaryFile(arrayBuffer);
@@ -368,7 +368,7 @@
             } else {
                 var http = new XMLHttpRequest();
                 http.onload = function() {
-                    if (http.status == "200") {
+                    if (this.status == 200 || this.status === 0) {
                         handleBinaryFile(http.response);
                     } else {
                         throw "Could not load image";
