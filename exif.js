@@ -128,7 +128,8 @@
         0x0110 : "Model",
         0x0131 : "Software",
         0x013B : "Artist",
-        0x8298 : "Copyright"
+        0x8298 : "Copyright",
+        0x9c9e : "XPKeywords"
     };
 
     var GPSTags = EXIF.GPSTags = {
