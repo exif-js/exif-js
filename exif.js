@@ -641,7 +641,7 @@
     }
 
     function getStringFromDB(buffer, start, length) {
-        var outstr = "";
+        var outstr = "", n;
         for (n = start; n < start+length; n++) {
             outstr += String.fromCharCode(buffer.getUint8(n));
         }
@@ -802,4 +802,3 @@
         });
     }
 }.call(this));
-
