@@ -303,14 +303,6 @@
         }
     };
 
-    function addEvent(element, event, handler) {
-        if (element.addEventListener) {
-            element.addEventListener(event, handler, false);
-        } else if (element.attachEvent) {
-            element.attachEvent("on" + event, handler);
-        }
-    }
-
     function imageHasData(img) {
         return !!(img.exifdata);
     }
@@ -642,7 +634,7 @@
 
     function getStringFromDB(buffer, start, length) {
         var outstr = "";
-        for (n = start; n < start+length; n++) {
+        for (var n = start; n < start+length; n++) {
             outstr += String.fromCharCode(buffer.getUint8(n));
         }
         return outstr;
