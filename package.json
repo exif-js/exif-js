@@ -8,17 +8,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jseidelin/exif-js"
+    "url": "https://github.com/exif-js/exif-js"
   },
   "keywords": [
     "exif"
   ],
   "author": "Jacob Seidelin",
+  "maintainers": [
+    "Roald de Vries"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jseidelin/exif-js/issues"
+    "url": "https://github.com/exif-js/exif-js/issues"
   },
-  "homepage": "https://github.com/jseidelin/exif-js",
+  "homepage": "https://github.com/exif-js/exif-js",
   "ignore": [
     "**/.*",
     "node_modules",
