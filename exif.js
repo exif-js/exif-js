@@ -850,7 +850,7 @@
             length = file.byteLength,
             dom = new DOMParser();
 
-        while (offset < length) {
+        while (offset < (length-4)) {
             if (getStringFromDB(dataView, offset, 4) == "http") {
                 var startOffset = offset - 1;
                 var sectionLength = dataView.getUint16(offset - 2) - 1;
@@ -884,7 +884,7 @@
     }
 
     function xml2Object(xml) {
-          try {
+        try {
             var obj = {};
             if (xml.children.length > 0) {
               for (var i = 0; i < xml.children.length; i++) {
