@@ -832,7 +832,7 @@
         }
 
         // extract thumbnail
-        tags['thumbnail'] = readThumbnailImage(dataView, tiffOffset, firstIFDOffset, bigEnd);
+        tags['thumbnail'] = readThumbnailImage(file, tiffOffset, firstIFDOffset, bigEnd);
 
         return tags;
     }
