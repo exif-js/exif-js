@@ -405,7 +405,7 @@
                 http.responseType = "arraybuffer";
                 http.send(null);
             }
-        } else if (window.FileReader && (img instanceof window.Blob || img instanceof window.File)) {
+        } else if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
             var fileReader = new FileReader();
             fileReader.onload = function(e) {
                 if (debug) console.log("Got file of length " + e.target.result.byteLength);
@@ -838,13 +838,18 @@
     }
 
    function findXMPinJPEG(file) {
-       var dataView = new DataView(file);
 
-       if (debug) console.log("Got file of length " + file.byteLength);
-       if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
+        if (!('DOMParser' in self)) {
+            console.warn('XML parsing not supported without DOMParser');
+            return;
+        }
+        var dataView = new DataView(file);
+
+        if (debug) console.log("Got file of length " + file.byteLength);
+        if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
            if (debug) console.log("Not a valid JPEG");
            return false; // not a valid jpeg
-       }
+        }
 
         var offset = 2,
             length = file.byteLength,
@@ -923,7 +928,10 @@
     }
 
     EXIF.getData = function(img, callback) {
-        if ((img instanceof Image || img instanceof HTMLImageElement) && !img.complete) return false;
+        if ((self.Image && img instanceof self.Image)
+            || (self.HTMLImageElement && img instanceof self.HTMLImageElement)
+            && !img.complete)
+            return false;
 
         if (!imageHasData(img)) {
             getImageData(img, callback);
