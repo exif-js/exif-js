@@ -706,11 +706,11 @@
         // JPEG format and 160x120pixels of size are recommended thumbnail format for Exif2.1 or later.
 
         if (thumbTags['Compression']) {
-             console.log('Thumbnail image found!');
+            // console.log('Thumbnail image found!');
 
             switch (thumbTags['Compression']) {
                 case 6:
-                    console.log('Thumbnail image format is JPEG');
+                    // console.log('Thumbnail image format is JPEG');
                     if (thumbTags.JpegIFOffset && thumbTags.JpegIFByteCount) {
                     // extract the thumbnail
                         var tOffset = tiffStart + thumbTags.JpegIFOffset;
