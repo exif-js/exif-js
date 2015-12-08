@@ -686,11 +686,11 @@
         var IFD1OffsetPointer = getNextIFDOffset(dataView, tiffStart+firstIFDOffset, bigEnd);
 
         if (!IFD1OffsetPointer) {
-            console.log('******** IFD1Offset is empty, image thumb not found ********');
+            // console.log('******** IFD1Offset is empty, image thumb not found ********');
             return {};
         }
         else if (IFD1OffsetPointer > dataView.byteLength) { // this should not happen
-            console.log('******** IFD1Offset is outside the bounds of the DataView ********');
+            // console.log('******** IFD1Offset is outside the bounds of the DataView ********');
             return {};
         }
         // console.log('*******  thumbnail IFD offset (IFD1) is: %s', IFD1OffsetPointer);
@@ -840,7 +840,7 @@
    function findXMPinJPEG(file) {
 
         if (!('DOMParser' in self)) {
-            console.warn('XML parsing not supported without DOMParser');
+            // console.warn('XML parsing not supported without DOMParser');
             return;
         }
         var dataView = new DataView(file);
