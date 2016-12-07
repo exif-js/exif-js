@@ -20,7 +20,7 @@ Then add a `script` tag in your an HTML in the [best position](http://stackoverf
 
     <script src="vendors/exif-js/exif-js"></script>
 
-**Note**: This repo has no `.min.js`. Do your own [minification](https://en.wikipedia.org/wiki/Minification_(programming) if you want that.
+**Note**: This repo has no `.min.js`. Do your own [minification](https://en.wikipedia.org/wiki/Minification_(programming)) if you want that.
 
 If you prefer another package manager you will probably manage :D. Or you can clone this GIT repository or download it's ZIP file and extract `exif.js` to your project.
 
