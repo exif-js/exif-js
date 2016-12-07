@@ -757,11 +757,29 @@
         if (!imageHasData(img)) return;
         return img.exifdata[tag];
     }
+    
+    EXIF.getIptcTag = function(img, tag) {
+        if (!imageHasData(img)) return;
+        return img.iptcdata[tag];
+    }
 
     EXIF.getAllTags = function(img) {
         if (!imageHasData(img)) return {};
         var a,
             data = img.exifdata,
+            tags = {};
+        for (a in data) {
+            if (data.hasOwnProperty(a)) {
+                tags[a] = data[a];
+            }
+        }
+        return tags;
+    }
+    
+    EXIF.getAllIptcTags = function(img) {
+        if (!imageHasData(img)) return {};
+        var a,
+            data = img.iptcdata,
             tags = {};
         for (a in data) {
             if (data.hasOwnProperty(a)) {
