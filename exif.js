@@ -639,13 +639,9 @@
                 }
         }
     }
-
+    
     function getStringFromDB(buffer, start, length) {
-        var outstr = "";
-        for (n = start; n < start+length; n++) {
-            outstr += String.fromCharCode(buffer.getUint8(n));
-        }
-        return outstr;
+        return new TextDecoder().decode(new DataView(buffer.buffer, start, length));
     }
 
     function readEXIFData(file, start) {
