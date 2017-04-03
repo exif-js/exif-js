@@ -401,6 +401,11 @@
                     }
                     http = null;
                 };
+                http.onerror = function() {
+		            throw "Could not load image";
+		            http = null;
+	            }
+                
                 http.open("GET", img.src, true);
                 http.responseType = "arraybuffer";
                 http.send(null);
