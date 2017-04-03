@@ -67,7 +67,7 @@ function getExif() {
 **HTML**:
 ```html
 <img src="image1.jpg" id="img1" />
-<pre>Make and model: <span id="makeAndModel"></span></div>
+<pre>Make and model: <span id="makeAndModel"></span></pre>
 <br/>
 <img src="image2.jpg" id="img2" />
 <pre id="allMetaDataSpan"></pre>
@@ -76,11 +76,10 @@ function getExif() {
 
 Note there are also alternate tags, such the `EXIF.TiffTags`. See the source code for the full definition and use.
 You can also get back a string with all the EXIF information in the image pretty printed by using `EXIF.pretty`.
-Check the included [example/index.html](/exif-js/exif-js/blob/master/example/index.html).
+Check the included [example/index.html](example/index.html).
 
 Please refer to the [source code](exif.js) for more advanced usages such as getting image data from a [File/Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) object (`EXIF.readFromBinaryFile`).
 
 ## Contributions
-This is an [open source project](LICENSE.md). Please contribute by forking this repo and issueing a pull request. The project has had notable contributions already, like reading ITPC data.
-You can also contribute by [filing bugs or new features please issue](/exif-js/issues).
-Or improve the documentation. Please update this README when you do a pull request of proposed changes in base functionality.
+This is an [open source project](LICENSE.md). Please contribute by forking this repo and issuing a pull request. The project has had notable contributions already, like reading ITPC data.
+You can also contribute by [filing bugs or new features in the issue tracker](https://github.com/exif-js/exif-js/issues) or improving the documentation. Please update this README when you do a pull request of proposed changes in base functionality.
