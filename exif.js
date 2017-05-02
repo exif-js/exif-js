@@ -907,7 +907,7 @@
                 var nodeName = item.nodeName;
 
                 if (typeof (obj[nodeName]) == "undefined") {
-                  obj[nodeName] = xml2json(item);
+                  obj[nodeName] = xml2Object(item);
                 } else {
                   if (typeof (obj[nodeName].push) == "undefined") {
                     var old = obj[nodeName];
@@ -915,7 +915,7 @@
                     obj[nodeName] = [];
                     obj[nodeName].push(old);
                   }
-                  obj[nodeName].push(xml2json(item));
+                  obj[nodeName].push(xml2Object(item));
                 }
               }
             } else {
@@ -928,8 +928,8 @@
     }
 
     EXIF.getData = function(img, callback) {
-        if ((self.Image && img instanceof self.Image)
-            || (self.HTMLImageElement && img instanceof self.HTMLImageElement)
+        if (((self.Image && img instanceof self.Image)
+            || (self.HTMLImageElement && img instanceof self.HTMLImageElement))
             && !img.complete)
             return false;
 
@@ -947,7 +947,7 @@
         if (!imageHasData(img)) return;
         return img.exifdata[tag];
     }
-    
+
     EXIF.getIptcTag = function(img, tag) {
         if (!imageHasData(img)) return;
         return img.iptcdata[tag];
@@ -965,7 +965,7 @@
         }
         return tags;
     }
-    
+
     EXIF.getAllIptcTags = function(img) {
         if (!imageHasData(img)) return {};
         var a,
