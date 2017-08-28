@@ -369,10 +369,10 @@
         function handleBinaryFile(binFile) {
             var data = findEXIFinJPEG(binFile);
             var iptcdata = findIPTCinJPEG(binFile);
-            var xmpdata= findXMPinJPEG(binFile);
+            // var xmpdata= findXMPinJPEG(binFile); // Not really used anywhere and causes crashing
             img.exifdata = data || {};
             img.iptcdata = iptcdata || {};
-            img.xmpdata = xmpdata || {};
+            // img.xmpdata = xmpdata || {}; // Not really used anywhere and causes crashing
             if (callback) {
                 callback.call(img);
             }
@@ -736,7 +736,7 @@
 
     function getStringFromDB(buffer, start, length) {
         var outstr = "";
-        for (n = start; n < start+length; n++) {
+        for (var n = start; n < start+length; n++) {
             outstr += String.fromCharCode(buffer.getUint8(n));
         }
         return outstr;
@@ -928,8 +928,8 @@
     }
 
     EXIF.getData = function(img, callback) {
-        if ((self.Image && img instanceof self.Image)
-            || (self.HTMLImageElement && img instanceof self.HTMLImageElement)
+        if (((self.Image && img instanceof self.Image)
+            || (self.HTMLImageElement && img instanceof self.HTMLImageElement))
             && !img.complete)
             return false;
 
