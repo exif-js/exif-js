@@ -40,8 +40,8 @@ The tag names to use are listed in `EXIF.Tags` in `exif.js`.
 **Important**: Note that you have to wait for the image to be completely loaded, before calling `getData` or any other function. It will silently fail otherwise.
 You can implement this wait, by running your exif-extracting logic on the `window.onLoad` function. Or on an image's own `onLoad` function.
 For jQuery users please note that you can NOT (reliably) use jQuery's `ready` event for this. Because it fires before images are loaded.
-You could use $(window).load() instead of $(document.ready() (please note that `exif-js has NO dependency on jQuery or any other external library). 
- 
+You could use $(window).load() instead of $(document.ready() (please note that `exif-js has NO dependency on jQuery or any other external library).
+
 **JavaScript**:
 ```javascript
 window.onload=getExif;
@@ -76,7 +76,7 @@ function getExif() {
 
 Note there are also alternate tags, such the `EXIF.TiffTags`. See the source code for the full definition and use.
 You can also get back a string with all the EXIF information in the image pretty printed by using `EXIF.pretty`.
-Check the included [example/index.html](/exif-js/exif-js/blob/master/example/index.html).
+Check the included [example/index.html](example/index.html).
 
 Please refer to the [source code](exif.js) for more advanced usages such as getting image data from a [File/Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) object (`EXIF.readFromBinaryFile`).
 
