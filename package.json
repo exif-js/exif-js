@@ -1,6 +1,6 @@
 {
   "name": "exif-js",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "JavaScript library for reading EXIF image metadata",
   "main": "exif.js",
   "directories": {
