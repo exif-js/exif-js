@@ -76,7 +76,7 @@ function getExif() {
 
 Note there are also alternate tags, such the `EXIF.TiffTags`. See the source code for the full definition and use.
 You can also get back a string with all the EXIF information in the image pretty printed by using `EXIF.pretty`.
-Check the included [index.html](/exif-js/exif-js/blob/master/index.html).
+Check the included [index.html](index.html).
 
 **XMP**
 Since issue #53 was merged also extracting of XMP data is supported. To not slow down this is optional, and you need to call `EXIF.enableXmp();` before using `..getDatat()`.
