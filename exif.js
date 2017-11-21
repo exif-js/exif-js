@@ -628,18 +628,14 @@
                 if (numValues == 1) {
                     numerator = file.getUint32(valueOffset, !bigEnd);
                     denominator = file.getUint32(valueOffset+4, !bigEnd);
-                    val = new Number(numerator / denominator);
-                    val.numerator = numerator;
-                    val.denominator = denominator;
+                    val = { value: numerator / denominator, numerator: numerator, denominator: denominator };
                     return val;
                 } else {
                     vals = [];
                     for (n=0;n<numValues;n++) {
                         numerator = file.getUint32(valueOffset + 8*n, !bigEnd);
                         denominator = file.getUint32(valueOffset+4 + 8*n, !bigEnd);
-                        vals[n] = new Number(numerator / denominator);
-                        vals[n].numerator = numerator;
-                        vals[n].denominator = denominator;
+                        vals[n] = { value: numerator / denominator, numerator: numerator, denominator: denominator };
                     }
                     return vals;
                 }
