@@ -34,7 +34,7 @@ Start with calling the `EXIF.getData` function. You pass it an image as a parame
 As a second parameter you specify a callback function. In the callback function you should use `this` to access the image with the aforementioned metadata you can then use as you want.
 That image now has an extra `exifdata` property which is a Javascript object with the EXIF metadata. You can access it's properties to get data like the *image caption*, the *date a photo was taken* or it's *orientation*.
 
-You can get all tages with `EXIF.getTag`. Or get a single tag with `EXIF.getTag`, where you specify the tag as the second parameter.
+You can get all tags with `EXIF.getAllTags(img)`. Or get a single tag with `EXIF.getTag(img, 'tag')`, where you specify the tag as the second parameter.
 The tag names to use are listed in `EXIF.Tags` in `exif.js`.
 
 **Important**: Note that you have to wait for the image to be completely loaded, before calling `getData` or any other function. It will silently fail otherwise.
