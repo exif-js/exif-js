@@ -367,30 +367,47 @@
 
     function getImageData(img, callback) {
         function handleBinaryFile(binFile) {
+            var outdata = {};
+
             var data = findEXIFinJPEG(binFile);
-            img.exifdata = data || {};
+            outdata.exifdata = data || {};
             var iptcdata = findIPTCinJPEG(binFile);
-            img.iptcdata = iptcdata || {};
+            outdata.iptcdata = iptcdata || {};
             if (EXIF.isXmpEnabled) {
-               var xmpdata= findXMPinJPEG(binFile);
-               img.xmpdata = xmpdata || {};               
+                var xmpdata = findXMPinJPEG(binFile);
+                outdata.xmpdata = xmpdata || {};
             }
-            if (callback) {
-                callback.call(img);
+
+            if ((self.Image && img instanceof self.Image)
+                || (self.HTMLImageElement && img instanceof self.HTMLImageElement)) {
+                // Assign data to the passed in Image element
+                Object.assign(img, outdata);
+                if (callback) {
+                    callback.call(img);
+                }
+            } else {
+                if (callback) {
+                    callback.call(outdata);
+                }
             }
         }
 
-        if (img.src) {
-            if (/^data\:/i.test(img.src)) { // Data URI
-                var arrayBuffer = base64ToArrayBuffer(img.src);
+
+        let img_src = null;
+        if (typeof img === "string") img_src = img;
+        else img_src = img.src;
+        
+        if (img_src) {
+            if (/^data\:/i.test(img_src)) { // Data URI
+                var arrayBuffer = base64ToArrayBuffer(img_src);
                 handleBinaryFile(arrayBuffer);
 
-            } else if (/^blob\:/i.test(img.src)) { // Object URL
+            } else if (/^blob\:/i.test(img_src)) { // Object URL
                 var fileReader = new FileReader();
                 fileReader.onload = function(e) {
                     handleBinaryFile(e.target.result);
                 };
-                objectURLToBlob(img.src, function (blob) {
+                objectURLToBlob(img_src, function (blob) {
                     fileReader.readAsArrayBuffer(blob);
                 });
             } else {
@@ -403,7 +420,7 @@
                     }
                     http = null;
                 };
-                http.open("GET", img.src, true);
+                http.open("GET", img_src, true);
                 http.responseType = "arraybuffer";
                 http.send(null);
             }
@@ -839,7 +856,7 @@
         return tags;
     }
 
-   function findXMPinJPEG(file) {
+    function findXMPinJPEG(file) {
 
         if (!('DOMParser' in self)) {
             // console.warn('XML parsing not supported without DOMParser');

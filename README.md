@@ -27,9 +27,10 @@ If you prefer another package manager you will probably manage :D. Or you can cl
 ## Usage
 The package adds a global `EXIF` variable (or AMD or CommonJS equivalent).
 
-Start with calling the `EXIF.getData` function. You pass it an image as a parameter:
+Start with calling the `EXIF.getData` function. You pass it an image or url string as a parameter:
 - either an image from a `<img src="image.jpg">`
-- OR a user selected image in a `<file type="input">` element on your page.
+- a user selected image in a `<file type="input">` element on your page
+- OR a url string (including object url and data string, ex: `"data:image/jpeg;base64,/9j/4W9..."`)
 
 As a second parameter you specify a callback function. In the callback function you should use `this` to access the image with the aforementioned metadata you can then use as you want.
 That image now has an extra `exifdata` property which is a Javascript object with the EXIF metadata. You can access it's properties to get data like the *image caption*, the *date a photo was taken* or it's *orientation*.
