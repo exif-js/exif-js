@@ -3,6 +3,7 @@
   "version": "2.3.0",
   "description": "JavaScript library for reading EXIF image metadata",
   "main": "exif.js",
+  "types": "exif.d.ts",
   "directories": {
     "example": "example"
   },
