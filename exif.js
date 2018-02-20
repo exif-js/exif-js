@@ -357,9 +357,18 @@
         var http = new XMLHttpRequest();
         http.open("GET", url, true);
         http.responseType = "blob";
+        http.onerror = function(err) {
+            console.error("Could not download image", err);
+            if (callback) {
+                callback.call(null, new Error("Could not download image"));
+            }
+        };
         http.onload = function(e) {
             if (this.status == 200 || this.status === 0) {
-                callback(this.response);
+                callback(this.response, null);
+            } else {
+                if (debug) console.log("Could not download image", this);
+                callback.call(null, new Error("Could not download image"));
             }
         };
         http.send();
@@ -367,54 +376,87 @@
 
     function getImageData(img, callback) {
         function handleBinaryFile(binFile) {
-            var data = findEXIFinJPEG(binFile);
-            img.exifdata = data || {};
-            var iptcdata = findIPTCinJPEG(binFile);
-            img.iptcdata = iptcdata || {};
-            if (EXIF.isXmpEnabled) {
-               var xmpdata= findXMPinJPEG(binFile);
-               img.xmpdata = xmpdata || {};               
-            }
-            if (callback) {
-                callback.call(img);
+            try {
+                var data = findEXIFinJPEG(binFile);
+                img.exifdata = data || {};
+                var iptcdata = findIPTCinJPEG(binFile);
+                img.iptcdata = iptcdata || {};
+                if (EXIF.isXmpEnabled) {
+                var xmpdata= findXMPinJPEG(binFile);
+                img.xmpdata = xmpdata || {};               
+                }
+                if (callback) {
+                    callback.call(img, null);
+                }
+            } catch (err) {
+                console.error(err);
+                if (callback) {
+                    callback.call(null, new Error("Could not get image data"));
+                }
             }
         }
 
-        if (img.src) {
-            if (/^data\:/i.test(img.src)) { // Data URI
-                var arrayBuffer = base64ToArrayBuffer(img.src);
-                handleBinaryFile(arrayBuffer);
+        try {
+            if (img.src) {
+                if (/^data\:/i.test(img.src)) { // Data URI
+                    var arrayBuffer = base64ToArrayBuffer(img.src);
+                    handleBinaryFile(arrayBuffer);
 
-            } else if (/^blob\:/i.test(img.src)) { // Object URL
+                } else if (/^blob\:/i.test(img.src)) { // Object URL
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(e) {
+                        handleBinaryFile(e.target.result);
+                    };
+                    fileReader.onerror = function(err) {
+                        console.error("Could not read file", err);
+                        if (callback) {
+                            callback.call(null, new Error("Could not read file"));
+                        }
+                    };
+                    objectURLToBlob(img.src, function (blob) {
+                        fileReader.readAsArrayBuffer(blob);
+                    });
+                } else {
+                    var http = new XMLHttpRequest();
+                    http.onerror = function(err) {
+                        console.error("Could not download image", err);
+                        if (callback) {
+                            callback.call(null, new Error("Could not download image"));
+                        }
+                    };
+                    http.onload = function() {
+                        if (this.status == 200 || this.status === 0) {
+                            handleBinaryFile(http.response);
+                        } else {
+                            if (debug) console.log("Could not download image", this);
+                            callback.call(null, new Error("Could not download image"));
+                        }
+                        http = null;
+                    };
+                    http.open("GET", img.src, true);
+                    http.responseType = "arraybuffer";
+                    http.send(null);
+                }
+            } else if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
                 var fileReader = new FileReader();
                 fileReader.onload = function(e) {
+                    if (debug) console.log("Got file of length " + e.target.result.byteLength);
                     handleBinaryFile(e.target.result);
                 };
-                objectURLToBlob(img.src, function (blob) {
-                    fileReader.readAsArrayBuffer(blob);
-                });
-            } else {
-                var http = new XMLHttpRequest();
-                http.onload = function() {
-                    if (this.status == 200 || this.status === 0) {
-                        handleBinaryFile(http.response);
-                    } else {
-                        throw "Could not load image";
+                fileReader.onerror = function(err) {
+                    console.error("Could not read file", err);
+                    if (callback) {
+                        callback.call(null, new Error("Could not read file"));
                     }
-                    http = null;
                 };
-                http.open("GET", img.src, true);
-                http.responseType = "arraybuffer";
-                http.send(null);
-            }
-        } else if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
-            var fileReader = new FileReader();
-            fileReader.onload = function(e) {
-                if (debug) console.log("Got file of length " + e.target.result.byteLength);
-                handleBinaryFile(e.target.result);
-            };
 
-            fileReader.readAsArrayBuffer(img);
+                fileReader.readAsArrayBuffer(img);
+            }
+        } catch (err) {
+            console.error("Could not get image data", err);
+            if (callback) {
+                callback.call(null, new Error("Could not get image data"));
+            }
         }
     }
 
@@ -983,7 +1025,7 @@
             getImageData(img, callback);
         } else {
             if (callback) {
-                callback.call(img);
+                callback.call(img, null);
             }
         }
         return true;
