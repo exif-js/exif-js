@@ -84,7 +84,7 @@ Since issue #53 was merged also extracting of XMP data is supported. To not slow
 Please refer to the [source code](exif.js) for more advanced usages such as getting image data from a [File/Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) object (`EXIF.readFromBinaryFile`).
 
 ## Contributions
-This is an [open source project](LICENSE.md). Please contribute by forking this repo and issueing a pull request. The project has had notable contributions already, like reading ITPC data.
+This is an [open source project](LICENSE.md). Please contribute by forking this repo and issuing a pull request. The project has had notable contributions already, like reading ITPC data.
 
 You can also contribute by [filing bugs or new features please issue](/exif-js/issues).
 Or improve the documentation. Please update this README when you do a pull request of proposed changes in base functionality.
