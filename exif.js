@@ -2,6 +2,7 @@
 
     var debug = false;
 	
+	// for more stricter checking, test for process.node (see https://github.com/MatthewNPM/is-node)
 	var isNode = window === undefined;
 
     var root = this;
@@ -727,11 +728,11 @@
                         var tOffset = tiffStart + thumbTags.JpegIFOffset;
                         var tLength = thumbTags.JpegIFByteCount;
 						if (isNode) {
+							thumbTags['blob'] = Buffer.from(new Uint8Array(dataView.buffer, tOffset, tLength));
+						} else {
 							thumbTags['blob'] = new Blob([new Uint8Array(dataView.buffer, tOffset, tLength)], {
 								type: 'image/jpeg'
 							});
-						} else {
-							thumbTags['blob'] = Buffer.from(new Uint8Array(dataView.buffer, tOffset, tLength));
 						}
                     }
                 break;
