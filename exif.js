@@ -1,6 +1,9 @@
 (function() {
 
     var debug = false;
+	
+	// for more stricter checking, test for process.node (see https://github.com/MatthewNPM/is-node)
+	var isNode = window === undefined;
 
     var root = this;
 
@@ -419,7 +422,14 @@
     }
 
     function findEXIFinJPEG(file) {
-        var dataView = new DataView(file);
+        var dataView;
+		
+		if (isNode && Buffer.isBuffer(file)) {
+			// convert buffer to ArrayBuffer compatible view
+			dataView = new DataView(Uint8Array.from(file).buffer);
+		} else {
+			dataView = new DataView(file);
+		}
 
         if (debug) console.log("Got file of length " + file.byteLength);
         if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
@@ -717,9 +727,13 @@
                     // extract the thumbnail
                         var tOffset = tiffStart + thumbTags.JpegIFOffset;
                         var tLength = thumbTags.JpegIFByteCount;
-                        thumbTags['blob'] = new Blob([new Uint8Array(dataView.buffer, tOffset, tLength)], {
-                            type: 'image/jpeg'
-                        });
+						if (isNode) {
+							thumbTags['blob'] = Buffer.from(new Uint8Array(dataView.buffer, tOffset, tLength));
+						} else {
+							thumbTags['blob'] = new Blob([new Uint8Array(dataView.buffer, tOffset, tLength)], {
+								type: 'image/jpeg'
+							});
+						}
                     }
                 break;
 
