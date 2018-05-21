@@ -823,10 +823,12 @@
             for (tag in gpsData) {
                 switch (tag) {
                     case "GPSVersionID" :
-                        gpsData[tag] = gpsData[tag][0] +
-                            "." + gpsData[tag][1] +
-                            "." + gpsData[tag][2] +
-                            "." + gpsData[tag][3];
+                        if (gpsData[tag]) {
+                            gpsData[tag] = gpsData[tag][0] +
+                                "." + gpsData[tag][1] +
+                                "." + gpsData[tag][2] +
+                                "." + gpsData[tag][3];
+                        }
                         break;
                 }
                 tags[tag] = gpsData[tag];
