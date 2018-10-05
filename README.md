@@ -18,11 +18,15 @@ Or [Bower](http://bower.io/):
 
 Then add a `script` tag in your an HTML in the [best position](http://stackoverflow.com/questions/436411/where-is-the-best-place-to-put-script-tags-in-html-markup) referencing your local file.
 
-    <script src="vendors/exif-js/exif-js"></script>
+```html
+<script src="vendors/exif-js/exif-js"></script>
+```
 
-**Note**: This repo has no `.min.js`. Do your own [minification](https://en.wikipedia.org/wiki/Minification_(programming)) if you want that.
+You can also use a minified version hosted on jsDelivr
 
-If you prefer another package manager you will probably manage :D. Or you can clone this GIT repository or download it's ZIP file and extract `exif.js` to your project.
+```html
+<script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+```
 
 ## Usage
 The package adds a global `EXIF` variable (or AMD or CommonJS equivalent).
@@ -67,7 +71,7 @@ function getExif() {
 **HTML**:
 ```html
 <img src="image1.jpg" id="img1" />
-<pre>Make and model: <span id="makeAndModel"></span></div>
+<pre>Make and model: <span id="makeAndModel"></span></pre>
 <br/>
 <img src="image2.jpg" id="img2" />
 <pre id="allMetaDataSpan"></pre>
