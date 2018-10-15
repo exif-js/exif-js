@@ -761,7 +761,8 @@
         }
         return thumbTags;
     }
-
+    
+//************************************************************************************************
     function getStringFromDB(buffer, start, length) {
 		// Manage UTF-8 string 
 		//use of an Array of bytes convert in hexa (arOut[])
@@ -777,7 +778,7 @@
 		outstr =  Utf8ArrayToStr(arOut);
 		return outstr;
     }
-//************************************************************************************************
+
 	// adopted from:
 	//   http://www.onicos.com/staff/iz/amuse/javascript/expert/utf.txt
 
