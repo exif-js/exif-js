@@ -1,6 +1,6 @@
 (function() {
 
-    var debug= false;
+    var debug = false;
 
     var root = this;
 
@@ -14,9 +14,9 @@
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = EXIF;
         }
-        exports.EXIF= EXIF;
+        exports.EXIF = EXIF;
     } else {
-        root.EXIF= EXIF;
+        root.EXIF = EXIF;
     }
 
     var ExifTags = EXIF.Tags = {
@@ -365,34 +365,30 @@
         http.send();
     }
 
-        EXIF.handleBinaryFile= handleBinaryFile= function(img, binFile) { console.log(arguments);
-            var data= findEXIFinJPEG(binFile);
-            img.exifdata= data || {};
-            var iptcdata= findIPTCinJPEG(binFile);
-            img.iptcdata= iptcdata || {};
+    function getImageData(img, callback) {
+        function handleBinaryFile(binFile) {
+            var data = findEXIFinJPEG(binFile);
+            img.exifdata = data || {};
+            var iptcdata = findIPTCinJPEG(binFile);
+            img.iptcdata = iptcdata || {};
             if (EXIF.isXmpEnabled) {
                var xmpdata= findXMPinJPEG(binFile);
-               img.xmpdata= xmpdata || {};               
+               img.xmpdata = xmpdata || {};               
             }
-            if(callback){
-               if(typeof callback == "function") callback.call(img);
+            if (callback) {
+                callback.call(img);
             }
         }
 
-    EXIF.getImageData= getImageData =function (img, callback) {
-
-        //EXIF.handleBinaryFile= handleBinaryFile; //Moded
-        if(img.getAttributeNS('http://www.w3.org/1999/xlink', 'href')) img.src= img.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
-
         if (img.src) {
             if (/^data\:/i.test(img.src)) { // Data URI
-                var arrayBuffer= base64ToArrayBuffer(img.src);
-                handleBinaryFile(img, arrayBuffer);
+                var arrayBuffer = base64ToArrayBuffer(img.src);
+                handleBinaryFile(arrayBuffer);
 
             } else if (/^blob\:/i.test(img.src)) { // Object URL
-                var fileReader= new FileReader();
-                fileReader.onload= function(e) {
-                    handleBinaryFile(img, e.target.result);
+                var fileReader = new FileReader();
+                fileReader.onload = function(e) {
+                    handleBinaryFile(e.target.result);
                 };
                 objectURLToBlob(img.src, function (blob) {
                     fileReader.readAsArrayBuffer(blob);
@@ -401,7 +397,7 @@
                 var http = new XMLHttpRequest();
                 http.onload = function() {
                     if (this.status == 200 || this.status === 0) {
-                        handleBinaryFile(img, http.response);
+                        handleBinaryFile(http.response);
                     } else {
                         throw "Could not load image";
                     }
@@ -411,18 +407,18 @@
                 http.responseType = "arraybuffer";
                 http.send(null);
             }
-        }else if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
+        } else if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
             var fileReader = new FileReader();
             fileReader.onload = function(e) {
                 if (debug) console.log("Got file of length " + e.target.result.byteLength);
-                handleBinaryFile(img, e.target.result);
+                handleBinaryFile(e.target.result);
             };
 
             fileReader.readAsArrayBuffer(img);
         }
     }
 
-    EXIF.findEXIFinJPEG= findEXIFinJPEG= function(file) {
+    function findEXIFinJPEG(file) {
         var dataView = new DataView(file);
 
         if (debug) console.log("Got file of length " + file.byteLength);
@@ -441,7 +437,7 @@
                 return false; // not a valid marker, something is wrong
             }
 
-            marker= dataView.getUint8(offset + 1);
+            marker = dataView.getUint8(offset + 1);
             if (debug) console.log(marker);
 
             // we could implement handling for other markers here,
@@ -1060,3 +1056,4 @@
         });
     }
 }.call(this));
+
