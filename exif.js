@@ -443,7 +443,7 @@
             // we could implement handling for other markers here,
             // but we're only looking for 0xFFE1 for EXIF data
 
-            if (marker == 225) {
+            if (marker == 225 && getStringFromDB(dataView, offset + 4, 4) === "Exif") {
                 if (debug) console.log("Found 0xFFE1 marker");
 
                 return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2);
