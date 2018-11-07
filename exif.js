@@ -326,6 +326,42 @@
             6 : "B"
         }
     };
+	
+	var IptcFieldMap = {
+        0x78 : 'caption',
+        0x6E : 'credit',
+        0x19 : 'keywords',
+        0x37 : 'dateCreated',
+        0x50 : 'byline',
+        0x55 : 'bylineTitle',
+	// add some codes
+		0x5A : 'city',
+		0x5C : 'sublocation',
+		0x5E : 'state',
+		0x64 : 'countryCode',
+		0x65 : 'countryName',
+		0x67 : 'OriginalTransmissionReference',
+		0x69 : 'headline',
+		0x6D : 'credit',
+		0x74 : 'copyright',
+		0x76 : 'contact',
+		0x78 : 'caption',		
+        0x7A : 'captionWriter',
+		0x7D : 'rasterizedCaption',
+		0x82 : 'imageType',
+		0x83 : 'imageOrientation',
+		0x87 : 'languageID',
+		0x96 : 'audioType',
+		0x97 : 'audioSamplingRate',
+		0x98 : 'audioSamplingRes',
+		0x99 : 'audioDuration',
+		0x9A : 'audioOutcue',
+		0xC8 : 'previewFileFormat',
+		0xC9 : 'previewFileFormatVer',
+		0xCA : 'previewData',
+	// end adding
+        0x0F : 'category'
+    };
 
     function addEvent(element, event, handler) {
         if (element.addEventListener) {
@@ -457,6 +493,8 @@
         }
 
     }
+	
+	
 
     function findIPTCinJPEG(file) {
         var dataView = new DataView(file);
@@ -511,18 +549,7 @@
         }
 
     }
-    var IptcFieldMap = {
-        0x78 : 'caption',
-        0x6E : 'credit',
-        0x19 : 'keywords',
-        0x37 : 'dateCreated',
-        0x50 : 'byline',
-        0x55 : 'bylineTitle',
-        0x7A : 'captionWriter',
-        0x69 : 'headline',
-        0x74 : 'copyright',
-        0x0F : 'category'
-    };
+	
     function readIPTCData(file, startOffset, sectionLength){
         var dataView = new DataView(file);
         var data = {};
@@ -556,7 +583,6 @@
         }
         return data;
     }
-
 
 
     function readTags(file, tiffStart, dirStart, strings, bigEnd) {
@@ -735,14 +761,69 @@
         }
         return thumbTags;
     }
-
+    
+//************************************************************************************************
     function getStringFromDB(buffer, start, length) {
+		// Manage UTF-8 string 
+		//use of an Array of bytes convert in hexa (arOut[])
         var outstr = "";
+		var arOut = [];
+		var j = 0;
         for (var n = start; n < start+length; n++) {
-            outstr += String.fromCharCode(buffer.getUint8(n));
+            //outstr += String.fromCharCode(buffer.getUint8(n));
+			arOut[j] = '0x' + buffer.getUint8(n).toString(16);
+			j++;
         }
-        return outstr;
+		//transform array to UTF-8 String with Utf8ArrayToStr function
+		outstr =  Utf8ArrayToStr(arOut);
+		return outstr;
     }
+
+	// adopted from:
+	//   http://www.onicos.com/staff/iz/amuse/javascript/expert/utf.txt
+
+	/* utf.js - UTF-8 <=> UTF-16 convertion
+	 *
+	 * Copyright (C) 1999 Masanao Izumo <iz@onicos.co.jp>
+	 * Version: 1.0
+	 * LastModified: Dec 25 1999
+	 * This library is free.  You can redistribute it and/or modify it.
+	 */
+
+	function Utf8ArrayToStr(array) {
+		var out, i, len, c;
+		var char2, char3;
+
+		out = "";
+		len = array.length;
+		i = 0;
+		while(i < len) {
+		c = array[i++];
+		switch(c >> 4)
+		{ 
+		  case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+			// 0xxxxxxx
+			out += String.fromCharCode(c);
+			break;
+		  case 12: case 13:
+			// 110x xxxx   10xx xxxx
+			char2 = array[i++];
+			out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+			break;
+		  case 14:
+			// 1110 xxxx  10xx xxxx  10xx xxxx
+			char2 = array[i++];
+			char3 = array[i++];
+			out += String.fromCharCode(((c & 0x0F) << 12) |
+						   ((char2 & 0x3F) << 6) |
+						   ((char3 & 0x3F) << 0));
+			break;
+		}
+		}
+
+		return out;
+	}
+//*******************************************************************************************************
 
     function readEXIFData(file, start) {
         if (getStringFromDB(file, start, 4) != "Exif") {
@@ -964,6 +1045,7 @@
               console.log(e.message);
           }
     }
+	
 
     EXIF.enableXmp = function() {
         EXIF.isXmpEnabled = true;
@@ -1024,7 +1106,21 @@
         }
         return tags;
     }
-
+	
+//***************************************************************************
+	// Written by Stanko Milosev
+	// Published: 30 January 2015
+	// http://www.milosev.com/425-reading-exif-meta-data-from-jpeg-image-files.html
+	// gps conversion for google map use
+	EXIF.ConvertDMSToDD = function (degrees, minutes, seconds, direction) {
+		var dd = degrees + minutes/60 + seconds/(60*60);
+		if (direction == "S" || direction == "W") {
+			dd = dd * -1;
+		} // Don't do anything for N or E
+		return dd;
+	}
+	
+//*******************************************************************************
     EXIF.pretty = function(img) {
         if (!imageHasData(img)) return "";
         var a,
@@ -1056,4 +1152,3 @@
         });
     }
 }.call(this));
-
