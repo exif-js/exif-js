@@ -162,7 +162,9 @@
         0x001B : "GPSProcessingMethod",
         0x001C : "GPSAreaInformation",
         0x001D : "GPSDateStamp",
-        0x001E : "GPSDifferential"
+        0x001E : "GPSDifferential",
+        0x001f : "GPSHPositioningError"
+
     };
 
      // EXIF 2.3 Spec
