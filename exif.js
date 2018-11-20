@@ -365,7 +365,7 @@
         http.send();
     }
 
-    function getImageData(img, callback) {
+    function getImageData(img, callback,readOnlySize) {
         function handleBinaryFile(binFile) {
             var data = findEXIFinJPEG(binFile);
             img.exifdata = data || {};
@@ -413,8 +413,12 @@
                 if (debug) console.log("Got file of length " + e.target.result.byteLength);
                 handleBinaryFile(e.target.result);
             };
-
-            fileReader.readAsArrayBuffer(img);
+            if(readOnlySize){
+              fileReader.readAsArrayBuffer(img.slice(0, readOnlySize));
+            }else{
+              fileReader.readAsArrayBuffer(img);
+            }
+            
         }
     }
 
@@ -468,7 +472,7 @@
         }
 
         var offset = 2,
-            length = file.byteLength;
+            length = file.byteLength-5; //we will check the 5 next bytes
 
 
         var isFieldSegmentStart = function(dataView, offset){
@@ -973,14 +977,14 @@
         EXIF.isXmpEnabled = false;
     }
 
-    EXIF.getData = function(img, callback) {
+    EXIF.getData = function(img, callback, readOnlySize) {
         if (((self.Image && img instanceof self.Image)
             || (self.HTMLImageElement && img instanceof self.HTMLImageElement))
             && !img.complete)
             return false;
 
         if (!imageHasData(img)) {
-            getImageData(img, callback);
+            getImageData.apply(this,arguments);
         } else {
             if (callback) {
                 callback.call(img);
@@ -1055,5 +1059,5 @@
             return EXIF;
         });
     }
-}.call(this));
 
+}.call(this));
