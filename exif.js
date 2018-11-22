@@ -800,7 +800,11 @@
                     case "FileSource" :
                         exifData[tag] = StringValues[tag][exifData[tag]];
                         break;
-
+                        
+                    case "ExposureTime" :
+			exifData[tag] = exifData[tag].numerator + "/" + exifData[tag].denominator;
+			break;
+			
                     case "ExifVersion" :
                     case "FlashpixVersion" :
                         exifData[tag] = String.fromCharCode(exifData[tag][0], exifData[tag][1], exifData[tag][2], exifData[tag][3]);
