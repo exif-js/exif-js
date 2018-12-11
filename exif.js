@@ -129,6 +129,12 @@
         0x0131 : "Software",
         0x013B : "Artist",
         0x8298 : "Copyright"
+        
+        // lens tags
+        0xA432 : "LensSpecification",       // 4 rational values giving focal and aperture ranges
+        0xA433 : "LensMake",
+        0xA434 : "LensModel",
+        0xA435 : "LensSerialNumber",
     };
 
     var GPSTags = EXIF.GPSTags = {
