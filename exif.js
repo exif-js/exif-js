@@ -365,7 +365,7 @@
         http.send();
     }
 
-    function getImageData(img, callback) {
+    function getImageData(img, onSuccess, onError) {
         function handleBinaryFile(binFile) {
             var data = findEXIFinJPEG(binFile);
             img.exifdata = data || {};
@@ -375,9 +375,7 @@
                var xmpdata= findXMPinJPEG(binFile);
                img.xmpdata = xmpdata || {};               
             }
-            if (callback) {
-                callback.call(img);
-            }
+            return onSuccess && onSuccess.call(img);
         }
 
         if (img.src) {
@@ -395,13 +393,16 @@
                 });
             } else {
                 var http = new XMLHttpRequest();
-                http.onload = function() {
+                http.onload = function(e) {
                     if (this.status == 200 || this.status === 0) {
                         handleBinaryFile(http.response);
                     } else {
-                        throw "Could not load image";
+                        return onError && onError(e);
                     }
                     http = null;
+                };
+                http.onerror = function(e) {
+                    return onError && onError(e);
                 };
                 http.open("GET", img.src, true);
                 http.responseType = "arraybuffer";
