@@ -375,9 +375,7 @@
                var xmpdata= findXMPinJPEG(binFile);
                img.xmpdata = xmpdata || {};               
             }
-            if (onSuccess) {
-                onSuccess.call(img);
-            }
+            return onSuccess && onSuccess.call(img);
         }
 
         if (img.src) {
