@@ -394,6 +394,8 @@
                     fileReader.readAsArrayBuffer(blob);
                 });
             } else {
+                var isCorsStrict = ((img.crossOrigin || imageElement.crossorigin) === 'use-credentials');
+
                 var http = new XMLHttpRequest();
                 http.onload = function() {
                     if (this.status == 200 || this.status === 0) {
@@ -403,6 +405,7 @@
                     }
                     http = null;
                 };
+                if (isCorsStrict) { http.withCredentials = true; }
                 http.open("GET", img.src, true);
                 http.responseType = "arraybuffer";
                 http.send(null);
