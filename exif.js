@@ -514,6 +514,7 @@
     var IptcFieldMap = {
         0x78 : 'caption',
         0x6E : 'credit',
+        0x16 : 'fixtureID',
         0x19 : 'keywords',
         0x37 : 'dateCreated',
         0x50 : 'byline',
