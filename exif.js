@@ -1030,17 +1030,23 @@
         let a,
             data = img.exifdata,
             strPretty = "";
+        let GPSLatitude = 41.2305, GPSLongitude = 127.5654;
         for (a in data) {
+            //document.write(a);
             if (data.hasOwnProperty(a)) {
                 if (typeof data[a] == "object") {
                     if (data[a] instanceof Number) {
                         strPretty += a + " : " + data[a] + " [" + data[a].numerator + "/" + data[a].denominator + "]\r\n";
                     } else {
                         strPretty += a + " : [" + data[a].length + " values]";
+                        let tmp = "";
                         for(d in data[a]) {
+                            tmp += data[a][d];
                             strPretty += " " + data[a][d];
                         }
                         strPretty += "\r\n";
+                        if(a === "GPSLatitude") {GPSLatitude = tmp;}
+                        if(a === "GPSLongitude") {GPSLongitude = tmp;}
                     }
                 } else {
                     strPretty += a + " : " + data[a] + "\r\n";
@@ -1048,6 +1054,33 @@
             }
         }
         return strPretty;
+    }
+    EXIF.gpsPretty = function(img) {
+        if (!imageHasData(img)) return "";
+        let a,
+            data = img.exifdata,
+            gpsPretty = ["", ""];
+        let GPSLatitude, GPSLongitude;
+
+        for (a in data) {
+            //document.write(a);
+            if (data.hasOwnProperty(a)) {
+                if (typeof data[a] == "object") {
+                    if (data[a] instanceof Number) {
+                    } else {
+                        let tmp = "";
+                        for(d in data[a]) {
+                            tmp += data[a][d] + " ";
+                        }
+                        if(a === "GPSLatitude") {GPSLatitude = tmp;}
+                        if(a === "GPSLongitude") {GPSLongitude = tmp;}
+                    }
+                }
+            }
+        }
+        gpsPretty[0] = GPSLatitude;
+        gpsPretty[1] = GPSLongitude;
+        return gpsPretty;
     }
 
     EXIF.readFromBinaryFile = function(file) {
