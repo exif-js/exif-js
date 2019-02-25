@@ -3,6 +3,7 @@ interface EXIFStatic {
     getTag(img: any, tag: any): any;
     getAllTags(img: any): any;
     pretty(img: any): string;
+    gpsPretty(img: any): string;
     readFromBinaryFile(file: any): any;
 }
 

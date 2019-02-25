@@ -373,7 +373,7 @@
             img.iptcdata = iptcdata || {};
             if (EXIF.isXmpEnabled) {
                var xmpdata= findXMPinJPEG(binFile);
-               img.xmpdata = xmpdata || {};               
+               img.xmpdata = xmpdata || {};
             }
             if (callback) {
                 callback.call(img);
@@ -892,7 +892,7 @@
 
     function xml2json(xml) {
         var json = {};
-      
+
         if (xml.nodeType == 1) { // element node
           if (xml.attributes.length > 0) {
             json['@attributes'] = {};
@@ -904,7 +904,7 @@
         } else if (xml.nodeType == 3) { // text node
           return xml.nodeValue;
         }
-      
+
         // deal with children
         if (xml.hasChildNodes()) {
           for(var i = 0; i < xml.childNodes.length; i++) {
@@ -922,7 +922,7 @@
             }
           }
         }
-        
+
         return json;
     }
 
@@ -993,7 +993,7 @@
         if (!imageHasData(img)) return;
         return img.exifdata[tag];
     }
-    
+
     EXIF.getIptcTag = function(img, tag) {
         if (!imageHasData(img)) return;
         return img.iptcdata[tag];
@@ -1011,7 +1011,7 @@
         }
         return tags;
     }
-    
+
     EXIF.getAllIptcTags = function(img) {
         if (!imageHasData(img)) return {};
         var a,
@@ -1027,16 +1027,26 @@
 
     EXIF.pretty = function(img) {
         if (!imageHasData(img)) return "";
-        var a,
+        let a,
             data = img.exifdata,
             strPretty = "";
+        let GPSLatitude = 41.2305, GPSLongitude = 127.5654;
         for (a in data) {
+            //document.write(a);
             if (data.hasOwnProperty(a)) {
                 if (typeof data[a] == "object") {
                     if (data[a] instanceof Number) {
                         strPretty += a + " : " + data[a] + " [" + data[a].numerator + "/" + data[a].denominator + "]\r\n";
                     } else {
-                        strPretty += a + " : [" + data[a].length + " values]\r\n";
+                        strPretty += a + " : [" + data[a].length + " values]";
+                        let tmp = "";
+                        for(d in data[a]) {
+                            tmp += data[a][d];
+                            strPretty += " " + data[a][d];
+                        }
+                        strPretty += "\r\n";
+                        if(a === "GPSLatitude") {GPSLatitude = tmp;}
+                        if(a === "GPSLongitude") {GPSLongitude = tmp;}
                     }
                 } else {
                     strPretty += a + " : " + data[a] + "\r\n";
@@ -1044,6 +1054,33 @@
             }
         }
         return strPretty;
+    }
+    EXIF.gpsPretty = function(img) {
+        if (!imageHasData(img)) return "";
+        let a,
+            data = img.exifdata,
+            gpsPretty = ["", ""];
+        let GPSLatitude, GPSLongitude;
+
+        for (a in data) {
+            //document.write(a);
+            if (data.hasOwnProperty(a)) {
+                if (typeof data[a] == "object") {
+                    if (data[a] instanceof Number) {
+                    } else {
+                        let tmp = "";
+                        for(d in data[a]) {
+                            tmp += data[a][d] + " ";
+                        }
+                        if(a === "GPSLatitude") {GPSLatitude = tmp;}
+                        if(a === "GPSLongitude") {GPSLongitude = tmp;}
+                    }
+                }
+            }
+        }
+        gpsPretty[0] = GPSLatitude;
+        gpsPretty[1] = GPSLongitude;
+        return gpsPretty;
     }
 
     EXIF.readFromBinaryFile = function(file) {
