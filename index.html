@@ -7,23 +7,27 @@
     <title>Document</title>
 </head>
 <body>
-    Upload a local file to read Exif data.
-    <br/>
-    <input id="file-input" type="file" />
-    <br/><br/>
-    Click the images to read Exif data. The first image tests reading single tags, while the other two simply show all available data. Check this <a href="example">example</a> if you prefer not to click but see EXIF info immediately.
-    <br/><br/>
-    Note: these examples will not work if running from a local file:// URL.
-    <br/><br/>
+Upload a local file to read Exif data.
+<br/>
+<input id="file-input" type="file" />
+<br/><br/>
+Click the images to read Exif data. The first image tests reading single tags, while the other two simply show all available data. Check this <a href="example">example</a> if you prefer not to click but see EXIF info immediately.
+<br/><br/>
+Note: these examples will not work if running from a local file:// URL.
+<br/><br/>
 
-    <div style="white-space: pre-line;">
+<div style="white-space: pre-line;">
     <script type="text/javascript" src="exif.js"></script>
     <script>
+        let GPS;
         document.getElementById("file-input").onchange = function(e) {
             let file = e.target.files[0]
             if (file && file.name) {
                 EXIF.getData(file, function() {
                     let exifData = EXIF.pretty(this);
+                    GPS = ["", ""];
+                    GPS = EXIF.gpsPretty(this);
+                    document.getElementById("gps-show").innerHTML = GPS;
                     if (exifData) {
                         document.getElementById("exif").innerHTML = exifData;
                     } else {
@@ -31,10 +35,19 @@
                     }
                 });
             }
+
         }
+        window.onload = function() {
+            document.getElementById("gps-show").onclick = function (e) {
+                //window.location.href='https://www.openstreetmap.org/search?query=' + GPS[0] + '%2C' + GPS[1] + '#map=16/' + GPS[0] + '/' + GPS[1];
+                window.location.href='https://www.google.com/maps/search/' + GPS[0] + ',' + GPS[1];
+            }
+        }
+        //GPSLatitude = 41.2305, GPSLongitude = 127.5654;
     </script>
-    </div>
-    <pre id="exif">exifData</pre>
+</div>
+<pre id="exif">exifData</pre>
+<button id="gps-show" type="button"> OpenStreet </button>
 
 </body>
 </html>
