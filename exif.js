@@ -569,13 +569,6 @@
             entryOffset = dirStart + i*12 + 2;
             tag = strings[file.getUint16(entryOffset, !bigEnd)];
             if (!tag && debug) console.log("Unknown tag: " + file.getUint16(entryOffset, !bigEnd));
-            tags[tag] = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
-        }
-
-        for (i=0;i<entries;i++) {
-            entryOffset = dirStart + i*12 + 2;
-            tag = strings[file.getUint16(entryOffset, !bigEnd)];
-            if (!tag && debug) console.log("Unknown tag: " + file.getUint16(entryOffset, !bigEnd));
             if (tag !== undefined) {
                 tagValue = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
                 if (tagValue > 65535) { // tag value should not be more than max unsigned 16-bit integer
