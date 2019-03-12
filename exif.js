@@ -569,7 +569,17 @@
             entryOffset = dirStart + i*12 + 2;
             tag = strings[file.getUint16(entryOffset, !bigEnd)];
             if (!tag && debug) console.log("Unknown tag: " + file.getUint16(entryOffset, !bigEnd));
-            tags[tag] = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
+            if (tag !== undefined) {
+                tagValue = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
+                if (tagValue > 65535) { // tag value should not be more than max unsigned 16-bit integer
+                    if (debug) {
+                        console.log("Offset is outside the bounds of the DataView");
+                    }
+                }
+                else {
+                    tags[tag] = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
+                }
+            }
         }
         return tags;
     }
