@@ -575,9 +575,9 @@
                     if (debug) {
                         console.log("Offset is outside the bounds of the DataView");
                     }
-                    else {
-                        tags[tag] = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
-                    }
+                }
+                else {
+                    tags[tag] = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
                 }
             }
         }
