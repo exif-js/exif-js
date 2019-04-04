@@ -750,10 +750,13 @@
             return false;
         }
 
+        return readEXIFDataFromTIFF(file, start + 6);
+    }
+
+    function readEXIFDataFromTIFF(file, tiffOffset) {
         var bigEnd,
             tags, tag,
-            exifData, gpsData,
-            tiffOffset = start + 6;
+            exifData, gpsData;
 
         // test for TIFF validity and endianness
         if (file.getUint16(tiffOffset) == 0x4949) {
@@ -1047,7 +1050,13 @@
     }
 
     EXIF.readFromBinaryFile = function(file) {
-        return findEXIFinJPEG(file);
+        var exif = findEXIFinJPEG(file);
+        if (!exif) {
+            var dataView = new DataView(file);
+            exif = readEXIFDataFromTIFF(dataView, 0);
+        }
+
+        return exif;
     }
 
     if (typeof define === 'function' && define.amd) {
