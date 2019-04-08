@@ -614,6 +614,7 @@
                 }
 
             case 4: // long, 32 bit int
+            case 13: // IFD offset, long, 32 bit int (see https://owl.phy.queensu.ca/~phil/exiftool/standards.html)
                 if (numValues == 1) {
                     return file.getUint32(entryOffset + 8, !bigEnd);
                 } else {
