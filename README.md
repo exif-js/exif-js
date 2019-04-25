@@ -38,7 +38,7 @@ Start with calling the `EXIF.getData` function. You pass it an image as a parame
 As a second parameter you specify a callback function. In the callback function you should use `this` to access the image with the aforementioned metadata you can then use as you want.
 That image now has an extra `exifdata` property which is a Javascript object with the EXIF metadata. You can access it's properties to get data like the *image caption*, the *date a photo was taken* or it's *orientation*.
 
-You can get all tages with `EXIF.getTag`. Or get a single tag with `EXIF.getTag`, where you specify the tag as the second parameter.
+You can get all tags with `EXIF.getTag`. Or get a single tag with `EXIF.getTag`, where you specify the tag as the second parameter.
 The tag names to use are listed in `EXIF.Tags` in `exif.js`.
 
 **Important**: Note that you have to wait for the image to be completely loaded, before calling `getData` or any other function. It will silently fail otherwise.
@@ -83,7 +83,7 @@ You can also get back a string with all the EXIF information in the image pretty
 Check the included [index.html](/exif-js/exif-js/blob/master/index.html).
 
 **XMP**
-Since issue #53 was merged also extracting of XMP data is supported. To not slow down this is optional, and you need to call `EXIF.enableXmp();` before using `..getDatat()`.
+Since issue #53 was merged also extracting of XMP data is supported. To not slow down this is optional, and you need to call `EXIF.enableXmp();` before using `.getData()`.
 
 Please refer to the [source code](exif.js) for more advanced usages such as getting image data from a [File/Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) object (`EXIF.readFromBinaryFile`).
 
