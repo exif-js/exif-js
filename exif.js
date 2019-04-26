@@ -463,7 +463,7 @@
             if (marker == 'EXIF'){
                 if (debug) console.log("Found EXIF marker");
 
-                return readEXIFData(dataView, offset,true, dataView.getUint32(offset,true) );
+                return readEXIFData(dataView, offset,true, dataView.getUint32(offset,true), 4 );
             }else{
                 offset+=4;
             }
@@ -501,7 +501,7 @@
             if (marker == 225) {
                 if (debug) console.log("Found 0xFFE1 marker");
 
-                return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2);
+                return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2, 2);
 
                 // offset += 2 + file.getShortAt(offset+2, true);
 
@@ -799,7 +799,7 @@
         return outstr;
     }
 
-    function readEXIFData(file, start) {
+    function readEXIFData(file, start, end, chunkSizeBytes) {
         if (getStringFromDB(file, start, 4).toLowerCase() != "exif") {
             if (debug) console.log("Not valid EXIF data! " + getStringFromDB(file, start, 4));
             return false;
@@ -808,7 +808,7 @@
         var bigEnd,
             tags, tag,
             exifData, gpsData,
-            tiffOffset = start + 6;
+            tiffOffset = start + 4 + chunkSizeBytes;
 
         // test for TIFF validity and endianness
         if (file.getUint16(tiffOffset) == 0x4949) {
