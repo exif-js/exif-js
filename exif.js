@@ -367,14 +367,25 @@
 
     function getImageData(img, callback) {
         function handleBinaryFile(binFile) {
-            var data = findEXIFinJPEG(binFile);
-            img.exifdata = data || {};
-            var iptcdata = findIPTCinJPEG(binFile);
-            img.iptcdata = iptcdata || {};
-            if (EXIF.isXmpEnabled) {
-               var xmpdata= findXMPinJPEG(binFile);
-               img.xmpdata = xmpdata || {};               
+            var data,
+                iptcdata,
+                xmpdata;
+            
+            //First see if the file is a WEBP container, if not try JPEG parsing
+            if ( !(data=findEXIFinWEBP(binFile)) ) {                
+                
+                data = findEXIFinJPEG(binFile);            
+                iptcdata = findIPTCinJPEG(binFile); 
+                
+                if (EXIF.isXmpEnabled) {
+                    xmpdata= findXMPinJPEG(binFile);
+                    img.xmpdata = xmpdata || {};               
+                }
             }
+                
+            img.exifdata = data || {};
+            img.iptcdata = iptcdata || {};
+            
             if (callback) {
                 callback.call(img);
             }
@@ -416,6 +427,50 @@
 
             fileReader.readAsArrayBuffer(img);
         }
+    }
+    
+    function findEXIFinWEBP(file) {
+        var dataView = new DataView(file);
+
+        if (debug) console.log("Got file of length " + file.byteLength);
+        
+        //check RIFF - WEBP - VP8X (WEBP Extended File Format)        
+        if(
+            (dataView.getUint32(0) != 0x52494646) || 
+            (dataView.getUint32(8) != 0x57454250) ||
+            (dataView.getUint32(12) != 0x56503858)            
+        ){
+            if (debug) console.log("Not a valid WEBP Extended File format container");
+            return false;
+        }
+
+        // Check WEBP container header for EXIF flag (4th bit of 20th byte)
+        if(!(dataView.getUint8(20) & (1 << (4 - 1 )))){
+            if (debug) console.log("WEBP container does not contain EXIF metadata");
+            return false;
+        }
+
+         var offset = 16,
+             length = file.byteLength,
+             marker;
+
+        while(offset < length){                                        
+            offset+=dataView.getUint32(offset,true)+4;
+            var marker = getStringFromDB(dataView,offset,4);
+
+            if (debug) console.log(marker);
+            
+            if (marker == 'EXIF'){
+                if (debug) console.log("Found EXIF marker");
+
+                return readEXIFData(dataView, offset,true, dataView.getUint32(offset,true) );
+            }else{
+                offset+=4;
+            }
+        }
+
+        if (debug) console.log("WEBP container does not contain EXIF metadata, but header ");
+
     }
 
     function findEXIFinJPEG(file) {
@@ -745,7 +800,7 @@
     }
 
     function readEXIFData(file, start) {
-        if (getStringFromDB(file, start, 4) != "Exif") {
+        if (getStringFromDB(file, start, 4).toLowerCase() != "exif") {
             if (debug) console.log("Not valid EXIF data! " + getStringFromDB(file, start, 4));
             return false;
         }
