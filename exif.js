@@ -463,7 +463,7 @@
             if (marker == 'EXIF'){
                 if (debug) console.log("Found EXIF marker");
 
-                return readEXIFData(dataView, offset,true, dataView.getUint32(offset,true), 4 );
+                return readEXIFData(dataView, offset, dataView.getUint32(offset,true), 4 );
             }else{
                 offset+=4;
             }
