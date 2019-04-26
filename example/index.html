@@ -18,6 +18,9 @@
 
     <img src="Bloated-Hero.jpg" id="img3" /><br/>
     <pre id="img3WithXmpMetaData"></pre>
+    
+    <img src="Bloated-Hero.webp" id="img4" /><br/>
+    <pre id="webpImg4"></pre>
 
     <script type="text/javascript" src="../exif.js"></script>
     <script>
@@ -46,6 +49,13 @@
                 var allMetaData = EXIF.getAllTags(this);
                 var img3WithXmpMetaData = document.getElementById("img3WithXmpMetaData");
                 img3WithXmpMetaData.innerHTML = JSON.stringify(allMetaData, null, "\t");
+            });
+            
+            var img4 = document.getElementById("img4");            
+            EXIF.getData(img4, function() {
+                var allMetaData = EXIF.getAllTags(this);
+                var webpImg4 = document.getElementById("webpImg4");
+                webpImg4.innerHTML = JSON.stringify(allMetaData, null, "\t");
             });
         }
     </script>
