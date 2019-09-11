@@ -327,14 +327,6 @@
         }
     };
 
-    function addEvent(element, event, handler) {
-        if (element.addEventListener) {
-            element.addEventListener(event, handler, false);
-        } else if (element.attachEvent) {
-            element.attachEvent("on" + event, handler);
-        }
-    }
-
     function imageHasData(img) {
         return !!(img.exifdata);
     }
@@ -526,14 +518,13 @@
     function readIPTCData(file, startOffset, sectionLength){
         var dataView = new DataView(file);
         var data = {};
-        var fieldValue, fieldName, dataSize, segmentType, segmentSize;
+        var fieldValue, fieldName, dataSize, segmentType;
         var segmentStartPos = startOffset;
         while(segmentStartPos < startOffset+sectionLength) {
             if(dataView.getUint8(segmentStartPos) === 0x1C && dataView.getUint8(segmentStartPos+1) === 0x02){
                 segmentType = dataView.getUint8(segmentStartPos+2);
                 if(segmentType in IptcFieldMap) {
                     dataSize = dataView.getInt16(segmentStartPos+3);
-                    segmentSize = dataSize + 5;
                     fieldName = IptcFieldMap[segmentType];
                     fieldValue = getStringFromDB(dataView, segmentStartPos+5, dataSize);
                     // Check if we already stored a value with this name
