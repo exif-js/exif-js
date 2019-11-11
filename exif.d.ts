@@ -4,8 +4,8 @@ declare namespace EXIF {
 
 interface EXIFStatic {
     getData(
-      input: string | Blob | File | HTMLImageElement,
-      callback: (this: HTMLImageElement & { exifdata: EXIF.ExifData }) => void
+        input: string | Blob | File | HTMLImageElement,
+        callback: (this: HTMLImageElement & { exifdata: EXIF.ExifData }) => void
     ): any;
     getTag(img: any, tag: any): any;
     getAllTags(img: any): any;
