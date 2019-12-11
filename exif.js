@@ -1049,6 +1049,10 @@
     EXIF.readFromBinaryFile = function(file) {
         return findEXIFinJPEG(file);
     }
+    
+    EXIF.readXMPFromBinaryFile = function (file) {
+      return findXMPinJPEG(file);
+    }
 
     if (typeof define === 'function' && define.amd) {
         define('exif-js', [], function() {
