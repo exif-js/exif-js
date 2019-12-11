@@ -85,7 +85,7 @@ Check the included [index.html](/exif-js/exif-js/blob/master/index.html).
 **XMP**
 Since issue #53 was merged also extracting of XMP data is supported. To not slow down this is optional, and you need to call `EXIF.enableXmp();` before using `..getDatat()`.
 
-Please refer to the [source code](exif.js) for more advanced usages such as getting image data from a [File/Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) object (`EXIF.readFromBinaryFile`).
+Please refer to the [source code](exif.js) for more advanced usages such as getting image data from a [File/Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) object (`EXIF.readFromBinaryFile, EXIF.readXMPFromBinaryFile`).
 
 ## Contributions
 This is an [open source project](LICENSE.md). Please contribute by forking this repo and issueing a pull request. The project has had notable contributions already, like reading ITPC data.

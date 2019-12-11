@@ -4,6 +4,7 @@ interface EXIFStatic {
     getAllTags(img: any): any;
     pretty(img: any): string;
     readFromBinaryFile(file: any): any;
+    readXMPFromBinaryFile(file: any): any;
 }
 
 declare var EXIF : EXIFStatic;
