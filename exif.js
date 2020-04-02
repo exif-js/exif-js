@@ -1063,7 +1063,11 @@
 
     EXIF.readFromBinaryFile = function(file) {
         var exif = findEXIFinJPEG(file);
-        if (!exif) {
+        if (exif) {
+            if (EXIF.isXmpEnabled) {
+                exif.xmpData = findXMPinJPEG(file)
+            }
+        } else {
             var dataView = new DataView(file);
             exif = readEXIFDataFromTIFF(dataView, 0);
             if (EXIF.isXmpEnabled && exif.XMP) {
