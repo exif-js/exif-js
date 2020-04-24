@@ -380,17 +380,18 @@
             }
         }
 
-        if (img.src) {
-            if (/^data\:/i.test(img.src)) { // Data URI
-                var arrayBuffer = base64ToArrayBuffer(img.src);
+        if (img.currentSrc || img.src) {
+            var src = img.currentSrc || img.src;
+            if (/^data\:/i.test(src)) { // Data URI
+                var arrayBuffer = base64ToArrayBuffer(src);
                 handleBinaryFile(arrayBuffer);
 
-            } else if (/^blob\:/i.test(img.src)) { // Object URL
+            } else if (/^blob\:/i.test(src)) { // Object URL
                 var fileReader = new FileReader();
                 fileReader.onload = function(e) {
                     handleBinaryFile(e.target.result);
                 };
-                objectURLToBlob(img.src, function (blob) {
+                objectURLToBlob(src, function (blob) {
                     fileReader.readAsArrayBuffer(blob);
                 });
             } else {
@@ -403,7 +404,7 @@
                     }
                     http = null;
                 };
-                http.open("GET", img.src, true);
+                http.open("GET", src, true);
                 http.responseType = "arraybuffer";
                 http.send(null);
             }
