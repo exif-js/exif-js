@@ -739,6 +739,8 @@
     function getStringFromDB(buffer, start, length) {
         var outstr = "";
         for (var n = start; n < start+length; n++) {
+            // stop on null terminator, if necessary
+            if (buffer.getUint8(n) === 0) break;
             outstr += String.fromCharCode(buffer.getUint8(n));
         }
         return outstr;
