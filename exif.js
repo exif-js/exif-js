@@ -359,9 +359,16 @@
         http.responseType = "blob";
         http.onload = function(e) {
             if (this.status == 200 || this.status === 0) {
-                callback(this.response);
+                var err = null;
+                return callback(err, this.response);
             }
+            var err = new Error('Unhandled HTTP status=' + this.status)
+            return callback(err, null);
         };
+        http.onerror = function() {
+            var err = new Error('Failed to make XHR request to URL=' + url)
+            callback(err, null);
+        }
         http.send();
     }
 
@@ -373,49 +380,85 @@
             img.iptcdata = iptcdata || {};
             if (EXIF.isXmpEnabled) {
                var xmpdata= findXMPinJPEG(binFile);
-               img.xmpdata = xmpdata || {};               
+               img.xmpdata = xmpdata || {};
             }
             if (callback) {
                 callback.call(img);
             }
         }
-
-        if (img.src) {
-            if (/^data\:/i.test(img.src)) { // Data URI
-                var arrayBuffer = base64ToArrayBuffer(img.src);
-                handleBinaryFile(arrayBuffer);
-
-            } else if (/^blob\:/i.test(img.src)) { // Object URL
-                var fileReader = new FileReader();
-                fileReader.onload = function(e) {
-                    handleBinaryFile(e.target.result);
-                };
-                objectURLToBlob(img.src, function (blob) {
-                    fileReader.readAsArrayBuffer(blob);
-                });
-            } else {
-                var http = new XMLHttpRequest();
-                http.onload = function() {
-                    if (this.status == 200 || this.status === 0) {
-                        handleBinaryFile(http.response);
-                    } else {
-                        throw "Could not load image";
-                    }
-                    http = null;
-                };
-                http.open("GET", img.src, true);
-                http.responseType = "arraybuffer";
-                http.send(null);
+        function handleError(err) {
+            if (callback) {
+                return callback(err);
             }
-        } else if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
+            console.error('[exif-js] Failed to parse image', err);
+        }
+
+        function readWithFileReader(blobish) {
             var fileReader = new FileReader();
             fileReader.onload = function(e) {
-                if (debug) console.log("Got file of length " + e.target.result.byteLength);
-                handleBinaryFile(e.target.result);
+                try {
+                    if (debug) console.log("Got file of length " + e.target.result.byteLength);
+                    handleBinaryFile(e.target.result);
+                } catch (err) {
+                    return callback(err);
+                }
             };
-
-            fileReader.readAsArrayBuffer(img);
+            fileReader.onerror = function() {
+                return handleError(fileReader.error);
+            };
+            fileReader.readAsArrayBuffer(blobish);
         }
+
+        if (img.src) {
+            try {
+                var isDataUri = /^data\:/i.test(img.src)
+                if (isDataUri) {
+                    var arrayBuffer = base64ToArrayBuffer(img.src);
+                    return handleBinaryFile(arrayBuffer);
+                }
+                var isObjectUrl = /^blob\:/i.test(img.src)
+                if (isObjectUrl) {
+                    return objectURLToBlob(img.src, function (err, blob) {
+                        if (err) {
+                            return handleError(err);
+                        }
+                        return readWithFileReader(blob);
+                    });
+                }
+                var http = new XMLHttpRequest();
+                http.onload = function() {
+                    try {
+                        if (this.status == 200 || this.status === 0) {
+                            return handleBinaryFile(http.response);
+                        } else {
+                            return handleError(
+                                new Error("Could not load image, unhandled HTTP status=" + this.status)
+                            );
+                        }
+                    } catch (err) {
+                        return handleError(err);
+                    } finally {
+                        http = null;
+                    }
+                };
+                var url = img.src;
+                http.onerror = function() {
+                    var err = new Error('Failed to make XHR request to URL=' + url);
+                    return handleError(err);
+                }
+                http.open("GET", url, true);
+                http.responseType = "arraybuffer";
+                http.send(null);
+                return;
+            } catch (err) {
+                return handleError(err);
+            }
+        }
+        if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
+            return readWithFileReader(img);
+        }
+        var err = new Error('Could not handle supplied image');
+        return handleError(err);
     }
 
     function findEXIFinJPEG(file) {
@@ -974,19 +1017,23 @@
     }
 
     EXIF.getData = function(img, callback) {
-        if (((self.Image && img instanceof self.Image)
-            || (self.HTMLImageElement && img instanceof self.HTMLImageElement))
-            && !img.complete)
-            return false;
+        try {
+            if (((self.Image && img instanceof self.Image)
+                || (self.HTMLImageElement && img instanceof self.HTMLImageElement))
+                && !img.complete)
+                return false;
 
-        if (!imageHasData(img)) {
-            getImageData(img, callback);
-        } else {
-            if (callback) {
-                callback.call(img);
+            if (!imageHasData(img)) {
+                getImageData(img, callback);
+            } else {
+                if (callback) {
+                    callback.call(img);
+                }
             }
+            return true;
+        } catch (err) {
+            return callback(err);
         }
-        return true;
     }
 
     EXIF.getTag = function(img, tag) {
