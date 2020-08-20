@@ -410,8 +410,17 @@
         } else if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
             var fileReader = new FileReader();
             fileReader.onload = function(e) {
-                if (debug) console.log("Got file of length " + e.target.result.byteLength);
-                handleBinaryFile(e.target.result);
+                try {
+                    if (debug) console.log("Got file of length " + e.target.result.byteLength);
+                    handleBinaryFile(e.target.result);
+                } catch (err) {
+                    return callback(err);
+                }
+            };
+            fileReader.onerror = function() {
+                if (callback) {
+                    return callback(fileReader.error);
+                }
             };
 
             fileReader.readAsArrayBuffer(img);
