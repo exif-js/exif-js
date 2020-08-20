@@ -9,7 +9,7 @@
 <body>
 
     <img src="DSCN0614_small.jpg" id="img1" />
-    <pre>Make and model: <span id="makeAndModel"></span></div>
+    <pre>Make and model: <span id="makeAndModel"></span></pre>
     <br/>
 
     <img src="Bush-dog.jpg" id="img2" />
@@ -19,9 +19,41 @@
     <img src="Bloated-Hero.jpg" id="img3" /><br/>
     <pre id="img3WithXmpMetaData"></pre>
 
+    <h4>Processing an image that causes an error</h4>
+    <img src="girl.jpg" id="img4" style="width: 300px;" />
+    <pre>This photo should trigger an EXIF parsing error: <span id="img4Error"
+        ></span></pre>
+
+    <h4>Processing a Blob literal image</h4>
+    <pre>Result: <span id="img5Result"></span></pre>
+
+    <h4>Processing a Blob URL image</h4>
+    <img id="img6" /><br />
+    <pre>Result: <span id="img6Result"></span></pre>
+
+    <h4>Processing a Data URI image</h4>
+    <img id="img7" alt="face" src="data:image/jpeg;base64,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"
+    /><br />
+    <pre>Result: <span id="img7Result"></span></pre>
+
+    <h4>Handling a 404 image</h4>
+    <img id="img8" src="/wont-load.jpg" /><br />
+    <pre>Result: <span id="img8Result"></span></pre>
+
+    <h4>Handling a blob that won't parse</h4>
+    <pre>Result: <span id="img9Result"></span></pre>
+
+    <h4>Handling a data URI that won't parse</h4>
+    <pre>Result: <span id="img10Result"></span></pre>
+
     <script type="text/javascript" src="../exif.js"></script>
     <script>
         "use strict";
+        console.info(
+            'There will be some errors in here as we test failure cases, but ' +
+                  'we demote them to info level. If you see other errors, then ' +
+                  'there is something wrong.'
+        );
         window.onload=getExif;
 
         function getExif() {
@@ -46,6 +78,147 @@
                 var allMetaData = EXIF.getAllTags(this);
                 var img3WithXmpMetaData = document.getElementById("img3WithXmpMetaData");
                 img3WithXmpMetaData.innerHTML = JSON.stringify(allMetaData, null, "\t");
+            });
+
+            var img4 = document.getElementById("img4");
+            EXIF.getData(img4, function(err) {
+                var img4Error = document.getElementById("img4Error");
+                if (err) {
+                    img4Error.innerHTML = 'Successfully handled error: ' +
+                        err.message
+                    console.info(
+                        'Error during EXIF parsing, as expected for this photo',
+                        err
+                    );
+                } else {
+                    var msg = 'Failure: Expected error!';
+                    img4Error.innerHTML = msg;
+                    console.error(msg);
+                }
+            });
+
+            ;(function testBlobImage() {
+                var img5Result = document.getElementById("img5Result");
+                var img6Result = document.getElementById("img6Result");
+                var http = new XMLHttpRequest();
+                http.open("GET", './Bush-dog.jpg', true);
+                http.responseType = "blob";
+                http.onload = function(e) {
+                    if (this.status !== 200 && this.status !== 0) {
+                        var msg = 'Failed to get blob image with status=' +
+                            this.status;
+                        console.error(msg);
+                        img5Result.innerHTML = msg;
+                        img6Result.innerHTML = msg;
+                        return;
+                    }
+                    var blob = this.response;
+                    testImage5(blob);
+                    testImage6(blob);
+                };
+                http.onerror = function() {
+                    var msg = 'Failed to get blob image';
+                    console.error(new Error(msg));
+                    img5Result.innerHTML = msg;
+                    img6Result.innerHTML = msg;
+                }
+                http.send();
+
+                function testImage5(blob) {
+                    EXIF.getData(blob, function(err) {
+                        if (err) {
+                            var msg = 'Failed to get EXIF from blob image 5';
+                            console.error(msg, err);
+                            img5Result.innerHTML = msg;
+                            return;
+                        }
+                        var allMetaData = EXIF.getAllTags(this);
+                        img5Result.innerHTML = JSON.stringify(allMetaData, null, 2);
+                    });
+                }
+
+                function testImage6(blob) {
+                    var img6 = document.getElementById('img6');
+                    img6.src = URL.createObjectURL(blob);
+                    img6.onload = function() {
+                        EXIF.getData(img6, function(err) {
+                            if (err) {
+                                var msg = 'Failed to get EXIF from blob image 6';
+                                console.error(msg, err);
+                                img6Result.innerHTML = msg;
+                                return;
+                            }
+                            var allMetaData = EXIF.getAllTags(this);
+                            img6Result.innerHTML = JSON.stringify(allMetaData, null, 2);
+                        });
+                    }
+                }
+            })();
+
+            ;(function testDataUriImage() {
+                var img7Result = document.getElementById("img7Result");
+                var img7 = document.getElementById('img7');
+                EXIF.getData(img7, function(err) {
+                    if (err) {
+                        var msg = 'Failed to get EXIF from data URI image 7';
+                        console.error(msg, err);
+                        img7Result.innerHTML = msg;
+                        return;
+                    }
+                    var allMetaData = EXIF.getAllTags(this);
+                    img7Result.innerHTML = JSON.stringify(allMetaData, null, 2);
+                });
+            })();
+
+            var img8 = document.getElementById("img8");
+            EXIF.getData(img8, function(err) {
+                var img8Result = document.getElementById("img8Result");
+                if (err) {
+                    img8Result.innerHTML = 'Successfully handled error: ' +
+                        err.message
+                    console.info(
+                        'Error during EXIF parsing, as expected for this photo',
+                        err
+                    );
+                } else {
+                    var msg = 'Failure: Expected error!';
+                    img8Result.innerHTML = msg;
+                    console.error(msg);
+                }
+            });
+
+            var fakeBlob = {src: 'blob:blah'};
+            EXIF.getData(fakeBlob, function(err) {
+                var img9Result = document.getElementById("img9Result");
+                if (err) {
+                    img9Result.innerHTML = 'Successfully handled error: ' +
+                        err.message
+                    console.info(
+                        'Error during EXIF parsing, as expected for this photo',
+                        err
+                    );
+                } else {
+                    var msg = 'Failure: Expected error!';
+                    img9Result.innerHTML = msg;
+                    console.error(msg);
+                }
+            });
+
+            var fakeDataUri = {src: 'data:blah'};
+            EXIF.getData(fakeDataUri, function(err) {
+                var img10Result = document.getElementById("img10Result");
+                if (err) {
+                    img10Result.innerHTML = 'Successfully handled error: ' +
+                        err.message
+                    console.info(
+                        'Error during EXIF parsing, as expected for this photo',
+                        err
+                    );
+                } else {
+                    var msg = 'Failure: Expected error!';
+                    img10Result.innerHTML = msg;
+                    console.error(msg);
+                }
             });
         }
     </script>
