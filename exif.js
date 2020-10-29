@@ -80,7 +80,7 @@
         0xA401 : "CustomRendered",          // Special processing
         0xA402 : "ExposureMode",            // Exposure mode
         0xA403 : "WhiteBalance",            // 1 = auto white balance, 2 = manual
-        0xA404 : "DigitalZoomRation",       // Digital zoom ratio
+        0xA404 : "DigitalZoomRatio",        // Digital zoom ratio
         0xA405 : "FocalLengthIn35mmFilm",   // Equivalent foacl length assuming 35mm film camera (in mm)
         0xA406 : "SceneCaptureType",        // Type of scene
         0xA407 : "GainControl",             // Degree of overall image gain adjustment
