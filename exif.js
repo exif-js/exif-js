@@ -405,6 +405,7 @@
                 };
                 http.open("GET", img.src, true);
                 http.responseType = "arraybuffer";
+                http.withCredentials = true;
                 http.send(null);
             }
         } else if (self.FileReader && (img instanceof self.Blob || img instanceof self.File)) {
