@@ -973,10 +973,20 @@
         EXIF.isXmpEnabled = false;
     }
 
-    EXIF.getData = function(img, callback) {
-        if (((self.Image && img instanceof self.Image)
-            || (self.HTMLImageElement && img instanceof self.HTMLImageElement))
-            && !img.complete)
+    EXIF.getData = function(img, callback, allowNotCompleted = false) {
+        
+        let isImage = (self.Image && img instanceof self.Image);
+        let isHtmlElement = (self.HTMLImageElement && img instanceof self.HTMLImageElement);
+        let isComplete = allowNotCompleted || img.complete;
+
+        /* 
+           Allow not completed for the reason, that If one generates images from blob and creates
+           image element from it: EXIF's datas are there BUT the image element does not show up as
+           complete.
+           --Lauri J / lja@lja.fi
+        */
+
+        if ( (isImage || isHtmlElement) && (!isComplete))
             return false;
 
         if (!imageHasData(img)) {
